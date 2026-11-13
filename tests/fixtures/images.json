@@ -1,0 +1,17 @@
+{
+  "image": "example/hermes",
+  "tags": {
+    "v9.0.0": {
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "published": "2026-01-01"
+    },
+    "v9.1.0": {
+      "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "published": "2026-02-01"
+    },
+    "v9.2.0": {
+      "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "published": "2026-03-01"
+    }
+  }
+}
