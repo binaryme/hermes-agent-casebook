@@ -1,0 +1,33 @@
+{
+  "image": "nousresearch/hermes-agent",
+  "tags": {
+    "v2026.8.13": {
+      "digest": "sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6",
+      "published": "2026-08-13"
+    },
+    "v2026.9.21": {
+      "digest": "sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3",
+      "published": "2026-09-21"
+    },
+    "v2026.9.24": {
+      "digest": "sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7",
+      "published": "2026-09-24"
+    },
+    "v0.21.6": {
+      "digest": "sha256:55e192fba0cd4fde61142abbff5adeacff40efdb482ccd0ff877924bd274f909",
+      "published": "2026-10-08"
+    },
+    "v0.22.5": {
+      "digest": "sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d",
+      "published": "2026-10-23"
+    },
+    "v0.22.6": {
+      "digest": "sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d",
+      "published": "2026-11-02"
+    },
+    "v0.23.1": {
+      "digest": "sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08",
+      "published": "2026-11-10"
+    }
+  }
+}
