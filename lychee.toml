@@ -1,0 +1,19 @@
+accept = ["200", "429"]
+cache = true
+max_cache_age = "2d"
+max_redirects = 5
+max_retries = 3
+retry_wait_time = 5
+timeout = 30
+exclude_all_private = true
+exclude = [
+  '^https?://([a-z0-9-]+\.)*example\.(com|org|net)(/|$)',
+  '^https?://host\.docker\.internal',
+  '^https://github\.com/binaryme/hermes-agent-casebook',
+  '^https://github\.com/[^/]+/[^/]+/security/advisories/new$',
+  '^https://github\.com/[^/]+/[^/]+/issues/new',
+]
+exclude_path = [
+  'tests/fixtures/',
+  'results/',
+]
