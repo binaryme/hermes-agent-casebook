@@ -1,0 +1,10 @@
+[files]
+ignore-hidden = false
+extend-exclude = [
+  ".git/",
+  "LICENSE",
+  "LICENSE-CODE",
+]
+
+[default]
+locale = "en"
