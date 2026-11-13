@@ -1,0 +1,57 @@
+name: Entry is wrong
+description: Report a factual error in an existing entry.
+title: "Entry is wrong: "
+labels:
+  - entry-is-wrong
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A wrong entry is corrected in place and recorded in the changelog. You are credited unless you ask otherwise.
+
+        Do not include company, customer, host, IP, channel or personal identifiers, or real tokens and secrets.
+  - type: input
+    id: entry-id
+    attributes:
+      label: Entry id
+      description: The id from the entry's front matter.
+      placeholder: E1
+    validations:
+      required: true
+  - type: input
+    id: tag
+    attributes:
+      label: Image tag
+      description: The tag on which you observed something different from the entry.
+      placeholder: v0.23.1
+    validations:
+      required: true
+  - type: textarea
+    id: observed-output
+    attributes:
+      label: Observed output
+      description: The exact output you saw, and the command that produced it.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: what-is-wrong
+    attributes:
+      label: What the entry says that is wrong
+      description: Quote the sentence, and say what you think is correct.
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links pinned to a full 40-character commit, if you have them.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: This report contains no private identifiers or real secrets.
+          required: true

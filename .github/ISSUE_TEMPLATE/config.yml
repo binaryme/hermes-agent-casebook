@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a Hermes Agent vulnerability
+    url: https://github.com/NousResearch/hermes-agent/blob/main/SECURITY.md
+    about: Vulnerabilities in Hermes Agent go to the upstream project, privately. Read its SECURITY.md first. Do not open an issue here.

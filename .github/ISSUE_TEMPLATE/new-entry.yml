@@ -1,0 +1,81 @@
+name: New entry
+description: Propose one Hermes Agent behavior that surprised you, with a repro.
+title: "New entry: "
+labels:
+  - new-entry
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One behavior per proposal. The repro must run without model credentials.
+
+        Do not use this form for a security vulnerability in Hermes Agent. Report it upstream, privately, as described in the security policy of this repository.
+
+        Do not include company, customer, host, IP, channel or personal identifiers, or real tokens and secrets. Use `example.com` and placeholder secrets.
+  - type: input
+    id: hermes-version
+    attributes:
+      label: Hermes version or tag
+      description: The image tag, or the output of `hermes --version`. Add the image digest if you have it.
+      placeholder: v0.23.1
+    validations:
+      required: true
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Install method
+      options:
+        - Official Docker image (nousresearch/hermes-agent)
+        - pip
+        - Nix
+        - Desktop app
+        - Source checkout
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system and architecture
+      description: The host that ran the repro.
+      placeholder: Ubuntu 24.04, amd64
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal repro
+      description: Commands or a script of at most 30 non-blank lines. It must not need model credentials or private data.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected-vs-actual
+    attributes:
+      label: Expected vs actual
+      description: What you expected, what happened, and the single line of output that shows it.
+    validations:
+      required: true
+  - type: textarea
+    id: tags
+    attributes:
+      label: Tags checked
+      description: Tags where you saw the behavior and tags where you did not. Write "not checked" for the rest.
+    validations:
+      required: false
+  - type: textarea
+    id: upstream-searched
+    attributes:
+      label: Upstream issues searched
+      description: Links to related issues or pull requests in NousResearch/hermes-agent, or the search terms you used if you found none.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched upstream issues.
+          required: true
+        - label: This proposal contains no private identifiers or real secrets.
+          required: true
