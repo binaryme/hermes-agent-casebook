@@ -27,3 +27,13 @@ jobs:
       - uses: crate-ci/typos@276087d9a4f06398b3e04825487805e2d7375888
         with:
           config: _typos.toml
+
+  citation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: citation-file-format/cffconvert-github-action@4cf11baa70a673bfdf9dad0acc7ee33b3f4b6084
+        with:
+          args: --validate
