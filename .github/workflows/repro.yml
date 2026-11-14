@@ -1,0 +1,163 @@
+name: repro
+
+on:
+  pull_request:
+    paths:
+      - "entries/**"
+      - "harness/**"
+      - "guides/chatwoot/**"
+      - ".github/workflows/repro.yml"
+  workflow_dispatch:
+    inputs:
+      entry:
+        description: Entry slug to run; empty runs every entry
+        required: false
+        default: ""
+        type: string
+      tag:
+        description: Hermes tag to run; empty runs every tag the entry expects
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repro-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      has_work: ${{ steps.plan.outputs.has_work }}
+      smoke_tags: ${{ steps.smoke.outputs.tags }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: "3.12"
+      - id: plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          INPUT_ENTRY: ${{ inputs.entry }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            python3 harness/plan_matrix.py --all --entry "$INPUT_ENTRY" --tag "$INPUT_TAG" --github-output
+          else
+            python3 harness/plan_matrix.py --base "$BASE_SHA" --head "$HEAD_SHA" --github-output
+          fi
+      - id: smoke
+        run: echo "tags=$(jq -c '.tags | keys_unsorted | [first, last] | unique' harness/images.json)" >> "$GITHUB_OUTPUT"
+
+  smoke:
+    name: smoke ${{ matrix.tag }}
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJSON(needs.plan.outputs.smoke_tags) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Boot a gateway against the stub model
+        env:
+          TAG: ${{ matrix.tag }}
+        run: |
+          HERMES_IMAGE=$(jq -er --arg tag "$TAG" '.image + "@" + .tags[$tag].digest' harness/images.json)
+          WORK="$RUNNER_TEMP/smoke"
+          mkdir -p "$WORK"
+          export HERMES_IMAGE WORK
+          docker pull -q "$HERMES_IMAGE"
+          bash harness/smoke.sh
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: smoke-${{ matrix.tag }}
+          path: ${{ runner.temp }}/smoke/stub.jsonl
+          if-no-files-found: warn
+
+  run:
+    name: run ${{ matrix.tag }}
+    needs: plan
+    if: needs.plan.outputs.has_work == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - name: Free runner disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: "3.12"
+      - name: Pull the pinned image once
+        env:
+          TAG: ${{ matrix.tag }}
+        run: |
+          image=$(jq -er --arg tag "$TAG" '(.tags[$tag].digest // error("tag is not pinned")) as $digest | .image + "@" + $digest' harness/images.json)
+          docker pull "$image"
+          df -h /
+      - name: Run the planned entries
+        env:
+          TAG: ${{ matrix.tag }}
+          ENTRIES: ${{ join(matrix.entries, ' ') }}
+        run: |
+          status=0
+          for entry in $ENTRIES; do
+            python3 harness/run_repro.py --entry "$entry" --tag "$TAG" --results-dir results || status=1
+          done
+          exit "$status"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: results-${{ matrix.tag }}
+          path: results
+          if-no-files-found: warn
+
+  report:
+    needs: [plan, run]
+    if: always() && needs.plan.outputs.has_work == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        continue-on-error: true
+        with:
+          pattern: results-*
+          path: results
+          merge-multiple: true
+      - name: Summarize results
+        env:
+          RUN_RESULT: ${{ needs.run.result }}
+        run: |
+          mkdir -p results
+          {
+            echo "| entry | tag | class | token | expected |"
+            echo "| --- | --- | --- | --- | --- |"
+            find results -name '*.json' -print0 | sort -z | xargs -0 -r jq -r '"| \(.slug) | \(.tag) | \(.class) | \(.token) | \(.expected) |"'
+          } >> "$GITHUB_STEP_SUMMARY"
+          not_matching=$(find results -name '*.json' -print0 | xargs -0 -r jq -r 'select(.class != "match") | "\(.slug) \(.tag) \(.class)"')
+          if [ -n "$not_matching" ]; then
+            echo "$not_matching"
+            exit 1
+          fi
+          test "$RUN_RESULT" = "success"
