@@ -24,5 +24,9 @@ gateway_up "$WORK/data"
 test "$(post_v2 both-listed "$FIXTURES/payload.json" casebook-placeholder-secret)" = 202
 test "$(post_v2 first-missing "$FIXTURES/payload.json" casebook-placeholder-secret)" = 202
 waited=0
-until [ -n "$(texts_for ROUTE-BOTH)" ] && [ -n "$(texts_for ROUTE-MISSING)" ] || [ "$waited" -ge 120 ]; do sleep 2; waited=$((waited + 2)); done
+until [ -n "$(texts_for ROUTE-BOTH)" ] && [ -n "$(texts_for ROUTE-MISSING)" ]; do
+    [ "$waited" -lt 120 ] || { echo "a route's request never reached the stub model" >&2; exit 1; }
+    sleep 2
+    waited=$((waited + 2))
+done
 observed "$(injected ROUTE-BOTH)-$(injected ROUTE-MISSING)"

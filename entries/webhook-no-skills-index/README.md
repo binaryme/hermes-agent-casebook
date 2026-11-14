@@ -17,24 +17,15 @@ evidence:
 - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L99-L103
 - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L221
 - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L396-L409
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/run_turn.py#L435-L451
 - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/system_prompt.py#L412-L413
 - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/toolsets.py#L97-L102
 - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/toolsets.py#L640-L644
 repro: entries/webhook-no-skills-index/repro.sh
 needs_credentials: false
-confidence: reproduced
-verified_on:
-- tag: v2026.8.13
-  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
-  observed: empty-present-present
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302
-- tag: v0.23.1
-  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
-  date: '2026-11-14'
-  observed: empty-present-present
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302
-last_reviewed: 2026-11-13
+confidence: source-verified
+verified_on: []
+last_reviewed: '2026-11-14'
 limits: The repro checks whether the skills index is built, not whether a model would pick a skill from it. The workaround's effect on skill_manage was read in the source, not exercised.
 credits: []
 ---
@@ -45,10 +36,7 @@ You add a skill to the skills directory, and a webhook-triggered run behaves as 
 
 ## Verified on
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `empty-present-present` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302) |
-| v0.23.1 | `empty-present-present` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302) |
+No CI run has been recorded yet. Every statement below is source reading.
 
 ## Reproduce
 
@@ -56,7 +44,7 @@ You add a skill to the skills directory, and a webhook-triggered run behaves as 
 
 1. `hermes prompt-size --json --platform webhook` with an empty config, offline. It reads `skills_index.chars`.
 2. The same command with `platform_toolsets.webhook: [hermes-webhook, skills]`.
-3. A real gateway with a route whose `toolsets` is `[skills]`. It sends one signed request and greps the request the stub model received for the marker skill.
+3. A real gateway with a route whose `toolsets` is `[hermes-webhook, skills]`, the configuration recommended below. It sends one signed request and greps the request the stub model received for the marker skill.
 
 It prints `OBSERVED=<default>-<platform workaround>-<route workaround>`, each part `empty` or `present`.
 
@@ -66,7 +54,7 @@ It prints `OBSERVED=<default>-<platform workaround>-<route workaround>`, each pa
 | --- | --- | --- |
 | Default webhook toolset | the index lists `casebook-marker` | `empty` |
 | `platform_toolsets.webhook` adds `skills` | listed | `present` |
-| Route `toolsets: [skills]` | listed | `present` |
+| Route `toolsets: [hermes-webhook, skills]` | listed | `present` |
 
 `expect.json` records `empty-present-present` on v2026.8.13 and v0.23.1.
 
@@ -87,7 +75,7 @@ platform_toolsets:
     - skills
 ```
 
-or for one route, remembering that a route's `toolsets` replaces the platform default rather than adding to it ([v0.23.1 webhook.py L396-L409](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L396-L409)):
+or for one route, remembering that a route's `toolsets` replaces the platform default rather than adding to it: the gateway puts the route's list in place of `platform_toolsets.webhook` for that run ([v0.23.1 run_turn.py L435-L451](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/run_turn.py#L435-L451); the route lookup is [webhook.py L396-L409](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L396-L409), and the docs say "replaces" in [webhooks.md L88](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/website/docs/user-guide/messaging/webhooks.md?plain=1#L88)). Keep `hermes-webhook` in the list, or the route loses the default web tools:
 
 ```yaml
 platforms:
@@ -108,4 +96,4 @@ No upstream issue or pull request found on 2026-11-13. Searched for webhook toge
 
 ## Confidence and limits
 
-Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43538807302](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.
+CI-PENDING. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.

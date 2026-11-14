@@ -18,19 +18,9 @@ evidence:
 - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/gateway/platforms/webhook.py#L806-L829
 repro: entries/webhook-first-skill-only/repro.sh
 needs_credentials: false
-confidence: reproduced
-verified_on:
-- tag: v2026.8.13
-  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
-  observed: alpha-only-beta-only
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538816745
-- tag: v0.23.1
-  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
-  date: '2026-11-14'
-  observed: alpha-only-beta-only
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538816745
-last_reviewed: 2026-11-13
+confidence: source-verified
+verified_on: []
+last_reviewed: '2026-11-14'
 limits: The repro checks which skill bodies reach the model's input, not how a model would act on them. It covers list values only; scalar values are the separate bug in issue 124447.
 credits:
 - joibaremetal, who opened upstream pull request 139223 with a fix
@@ -38,14 +28,11 @@ credits:
 
 ## Symptom
 
-A route lists two skills under `skills:`. The agent follows the first one and ignores the second. If the first name is misspelled or missing, the second loads instead, so the route works until someone fixes the typo.
+A route lists two skills under `skills:`. The agent follows the first one and ignores the second. If the first name is misspelled or missing, the second loads instead, so the route works until someone fixes the typo. If you track skill usage, every skill after the first on a route shows no use at all.
 
 ## Verified on
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `alpha-only-beta-only` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538816745) |
-| v0.23.1 | `alpha-only-beta-only` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538816745) |
+No CI run has been recorded yet. Every statement below is source reading.
 
 ## Reproduce
 
@@ -83,4 +70,4 @@ Open. Pull request [#139223](https://github.com/NousResearch/hermes-agent/pull/1
 
 ## Confidence and limits
 
-Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43538816745](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538816745)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro inspects the model's input only. When pull request 139223 or another fix ships, the expected token for that tag becomes `both-beta-only`.
+CI-PENDING. The repro inspects the model's input only. When pull request 139223 or another fix ships, the expected token for that tag becomes `both-beta-only`.

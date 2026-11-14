@@ -6,5 +6,6 @@ platforms:
         with-skills:
           secret: casebook-placeholder-secret
           toolsets:
+            - hermes-webhook
             - skills
           prompt: "Reply with one word."

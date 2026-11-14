@@ -18,9 +18,11 @@ cp -R "$FIXTURES/gateway" "$WORK/gateway"
 cp -R "$FIXTURES/skills" "$WORK/gateway/skills"
 gateway_up "$WORK/gateway"
 test "$(post_v2 with-skills "$FIXTURES/payload.json" casebook-placeholder-secret)" = 202
-stub_wait 1 120
+stub_wait 2 120 || stub_wait 1 5
 route=empty
-if stub_text 0 | grep -q 'casebook-marker'; then
-    route=present
-fi
+i=0
+while [ "$i" -lt "$(stub_count)" ]; do
+    if stub_text "$i" | grep -q 'casebook-marker'; then route=present; fi
+    i=$((i + 1))
+done
 observed "$default-$platform-$route"
