@@ -1,0 +1,8 @@
+platforms:
+  webhook:
+    enabled: true
+    extra:
+      routes:
+        chatwoot:
+          secret: casebook-placeholder-secret
+          prompt: "Reply with one word."
