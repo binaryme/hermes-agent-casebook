@@ -4,7 +4,7 @@ source "$HARNESS/lib.sh"
 
 mkdir -p "$WORK/data"
 cp -R "$FIXTURES/skills" "$WORK/data/skills"
-hermes_exec_data "$WORK/data" prompt-size --json --platform cli 2>/dev/null >"$WORK/prompt-size.out"
+hermes_exec_data "$WORK/data" prompt-size --json --platform cli 2>"$WORK/prompt-size.err" >"$WORK/prompt-size.out" || { tail -n 20 "$WORK/prompt-size.err" >&2; exit 1; }
 shown=$(python3 - "$WORK/prompt-size.out" <<'PY'
 import json, sys
 text = open(sys.argv[1]).read()
@@ -12,10 +12,9 @@ skills = {s["name"]: s["index_line_bytes"] for s in json.loads(text[text.index("
 print(skills["casebook-trims"] - skills["casebook-short"] + 40)
 PY
 )
-if [ "$shown" -eq 60 ]; then
-    observed hard-cut
-elif [ "$shown" -lt 60 ]; then
-    observed word-cut
-else
-    observed not-cut
-fi
+case "$shown" in
+    60) observed hard-cut ;;
+    56) observed word-cut ;;
+    75) observed not-cut ;;
+    *) observed "shown-$shown" ;;
+esac
