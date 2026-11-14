@@ -82,6 +82,16 @@ jobs:
           export HERMES_IMAGE WORK
           docker pull -q "$HERMES_IMAGE"
           bash harness/smoke.sh
+      - name: Relay Chatwoot webhooks end to end
+        env:
+          TAG: ${{ matrix.tag }}
+        run: |
+          HERMES_IMAGE=$(jq -er --arg tag "$TAG" '.image + "@" + .tags[$tag].digest' harness/images.json)
+          WORK="$RUNNER_TEMP/chatwoot"
+          mkdir -p "$WORK"
+          export HERMES_IMAGE WORK
+          bash guides/chatwoot/e2e.sh | tee "$RUNNER_TEMP/chatwoot.out"
+          grep -qx 'OBSERVED=relay-ok' "$RUNNER_TEMP/chatwoot.out"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
