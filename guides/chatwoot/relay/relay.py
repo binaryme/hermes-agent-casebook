@@ -9,6 +9,7 @@ from urllib.parse import urlsplit
 
 DEFAULT_MAX_BODY_BYTES = 1024 * 1024
 UPSTREAM_TIMEOUT_SECONDS = 15
+CLIENT_TIMEOUT_SECONDS = 10
 SIGNATURE_PREFIX = "sha256="
 
 
@@ -68,6 +69,7 @@ def forward(upstream, body, headers, opener=urllib.request.urlopen):
 def make_handler(upstream, max_bytes, opener=urllib.request.urlopen):
     class RelayHandler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
+        timeout = CLIENT_TIMEOUT_SECONDS
 
         def log_message(self, format, *args):
             sys.stderr.write("relay: " + (format % args) + "\n")

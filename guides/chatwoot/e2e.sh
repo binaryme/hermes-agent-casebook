@@ -60,9 +60,10 @@ send_through_relay() {
     local sent=$2
     local header_args=()
     local line
+    python3 "$HARNESS/sign.py" chatwoot "$SECRET" "$signed" >"$WORK/headers.txt"
     while IFS= read -r line; do
         header_args+=(-H "$line")
-    done < <(python3 "$HARNESS/sign.py" chatwoot "$SECRET" "$signed")
+    done <"$WORK/headers.txt"
     curl -sS -o "$WORK/last-response.json" -w '%{http_code}' --max-time 30 \
         -X POST -H "Content-Type: application/json" "${header_args[@]}" \
         --data-binary "@$sent" "$RELAY_URL/"
@@ -70,8 +71,9 @@ send_through_relay() {
 
 signed=$(send_through_relay "$WORK/payload.json" "$WORK/payload.json")
 tampered=$(send_through_relay "$WORK/payload.json" "$WORK/tampered.json")
-unsigned=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 -X POST \
+unsigned=$(curl -sS -o "$WORK/unsigned.json" -w '%{http_code}' --max-time 30 -X POST \
     -H "Content-Type: application/json" --data-binary "@$WORK/payload.json" "$RELAY_URL/")
+grep -q 'missing Chatwoot signature' "$WORK/unsigned.json" || unsigned="$unsigned-not-from-relay"
 echo "through the relay: signed $signed, tampered $tampered, unsigned $unsigned" >&2
 
 if [ "$signed" = 202 ] && [ "$tampered" = 401 ] && [ "$unsigned" = 401 ]; then

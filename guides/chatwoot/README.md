@@ -39,12 +39,18 @@ platforms:
       routes:
         chatwoot:
           secret: "<the Chatwoot webhook secret>"
+          filters:
+            - field: "event"
+              equals: "message_created"
+            - field: "message_type"
+              equals: "incoming"
           prompt: |
             Draft a reply to this Chatwoot message. Do not send it.
             Conversation {conversation.id}: {content}
 ```
 
 - Use the secret Chatwoot generated for this webhook or agent bot. It is a `has_secure_token` value created with the record ([webhook_secretable.rb at v4.19.1](https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/app/models/concerns/webhook_secretable.rb#L4-L7)). Source-verified.
+- Chatwoot sends `message_created` for incoming, outgoing and template messages alike ([message_filter_helpers.rb L8-L10 at v4.19.1](https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/app/models/concerns/message_filter_helpers.rb#L8-L10)). Without the `filters` above, the agent drafts replies to your own agents' messages, and to its own once they are posted. Source-verified; `filters` is documented for routes at [webhooks.md L132-L163](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/website/docs/user-guide/messaging/webhooks.md?plain=1#L132-L163).
 - A route that has a secret rejects any request whose signature it cannot verify. With the relay in front, that means only requests Chatwoot signed with this secret get through. Observed in E3 and e2e.sh.
 - Payload fields are text from your customers. Hermes' docs call them untrusted even on an authenticated route ([webhooks.md L642](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/website/docs/user-guide/messaging/webhooks.md?plain=1#L642)). Keep the route's toolset small, and read [E1](../../entries/webhook-no-skills-index/README.md) before you add the `skills` toolset to it.
 
@@ -59,11 +65,14 @@ Point the Chatwoot webhook, or the agent bot's outgoing URL, at the relay. What 
 - It renames the three headers, strips the `sha256=` prefix, and forwards the body byte for byte.
 - It always forwards to the one `--upstream` URL given at startup; the request path cannot choose another route.
 - It refuses, without forwarding, a request with no Chatwoot signature or timestamp, a body without `Content-Length`, a chunked body, and a body over 1 MiB (`--max-body-bytes`).
-- It holds no secret. Hermes still checks the MAC and the 300-second replay window.
+- It holds no secret. Hermes still checks the MAC and rejects timestamps more than 300 seconds off. That window limits a replay to five minutes; it does not prevent one, because the delivery id Hermes deduplicates on is not covered by the MAC. Keep the relay on a network an attacker cannot capture traffic from.
+- It stops reading a request that stalls for 10 seconds.
 
 Observed: [e2e.sh](e2e.sh) boots a pinned gateway, puts the relay in front of it, and gets `202` for a signed request, `401` for a body changed after signing, and `401` at the relay for an unsigned request, on v2026.8.13 and v0.23.1.
 
 Run the relay on the same private network as Hermes. Expose only the relay, never the Hermes webhook port.
+
+From v4.14.0, Chatwoot sends webhooks through its SSRF filter ([trigger.rb L43 at v4.19.1](https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/lib/webhooks/trigger.rb#L43); not present at [v4.13.0](https://github.com/chatwoot/chatwoot/blob/88ffa329eb6e18ae06b608d8b4bab96c0e1b8f44/lib/webhooks/trigger.rb)). It refuses private and loopback addresses unless `SAFE_FETCH_ALLOW_PRIVATE_NETWORK` is true ([safe_fetch.rb L36-L38](https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/lib/safe_fetch.rb#L36-L38) and [fetcher.rb L46-L50](https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/lib/safe_fetch/fetcher.rb#L46-L50)). Source-verified. A self-hosted Chatwoot pointed at a relay on a private address therefore fails every delivery until you either give the relay a public address, or set that variable. The variable turns the SSRF protection off for all of Chatwoot's outbound fetches, not just webhooks, so weigh it before you do.
 
 ## Retries and acknowledgements
 
@@ -77,7 +86,7 @@ What Chatwoot does when Hermes does not answer `2xx`, source-verified at v4.19.1
 - Chatwoot waits 5 seconds for an answer unless `WEBHOOK_TIMEOUT` is set ([trigger.rb L118-L123](https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/lib/webhooks/trigger.rb#L118-L123)). Hermes answers `202` as soon as it has admitted the delivery and runs the agent afterwards ([webhook.py L747-L760 at v0.23.1](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L747-L760)), so a slow model does not time the webhook out. Source-verified; the `202` itself is observed.
 - When Hermes cannot admit a delivery, v0.23.1 answers `503` "Admission unavailable; retry this delivery" (same lines). Chatwoot does not retry a `503`, so that message is lost. Source-verified.
 - When an agent bot delivery fails for good, Chatwoot moves a `pending` conversation to `open` and posts an activity message, unless the account keeps conversations pending on bot failure ([trigger.rb L65-L89](https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/lib/webhooks/trigger.rb#L65-L89)). Source-verified.
-- A retry carries the same `X-Chatwoot-Delivery` id. The relay passes it as `X-Request-ID`, which Hermes uses as the delivery id for deduplication ([webhook.py L77-L80](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L77-L80)). So a retried delivery that Hermes already admitted gets `200 duplicate`, not a second run. Source-verified.
+- A retry carries the same `X-Chatwoot-Delivery` id. The relay passes it as `X-Request-ID`, which Hermes uses as the delivery id for deduplication ([webhook.py L77-L80](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L77-L80)). So a retried delivery that Hermes already admitted gets `200 duplicate`, not a second run, as long as the retry carries the same delivery id. Source-verified.
 
 ## Sending the reply back
 
@@ -88,6 +97,8 @@ Whatever you build, keep a human between the draft and the customer. Have the ag
 ## Checklist
 
 - [ ] Chatwoot is v4.11.2 or later, and v4.13.0 or later for agent bots.
+- [ ] On Chatwoot v4.14.0 or later, the relay's address is reachable through Chatwoot's SSRF filter.
+- [ ] The route only wakes the agent for incoming messages.
 - [ ] The Hermes route has the Chatwoot secret.
 - [ ] Only the relay is reachable from Chatwoot. The Hermes webhook port is not.
 - [ ] The route's toolset is the smallest that works.
