@@ -113,9 +113,10 @@ post_signed() {
     shift 2
     local header_args=()
     local line
+    python3 "$HARNESS/sign.py" "$@" >"$WORK/headers.txt"
     while IFS= read -r line; do
         header_args+=(-H "$line")
-    done < <(python3 "$HARNESS/sign.py" "$@")
+    done <"$WORK/headers.txt"
     curl -sS -o "$WORK/last-response.json" -w '%{http_code}' --max-time 30 \
         -X POST -H "Content-Type: application/json" \
         ${header_args[@]+"${header_args[@]}"} \
@@ -162,9 +163,10 @@ post_tampered() {
     local secret=$4
     local header_args=()
     local line
+    python3 "$HARNESS/sign.py" chatwoot-mapped "$secret" "$signed_payload" >"$WORK/headers.txt"
     while IFS= read -r line; do
         header_args+=(-H "$line")
-    done < <(python3 "$HARNESS/sign.py" chatwoot-mapped "$secret" "$signed_payload")
+    done <"$WORK/headers.txt"
     curl -sS -o "$WORK/last-response.json" -w '%{http_code}' --max-time 30 \
         -X POST -H "Content-Type: application/json" \
         "${header_args[@]}" --data-binary "@$sent_payload" "$url"

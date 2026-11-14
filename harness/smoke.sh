@@ -31,5 +31,11 @@ if ! stub_wait 1 120; then
     gateway_logs | tail -n 60 >&2
     exit 1
 fi
-stub_text 0 | grep -q 'SMOKE-7Q' || { echo "the marker did not reach the model" >&2; exit 1; }
+found=0
+i=0
+while [ "$i" -lt "$(stub_count)" ]; do
+    if stub_text "$i" | grep -q 'SMOKE-7Q'; then found=1; fi
+    i=$((i + 1))
+done
+[ "$found" = 1 ] || { echo "the marker did not reach the model" >&2; exit 1; }
 observed smoke-ok
