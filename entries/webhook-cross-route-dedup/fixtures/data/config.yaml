@@ -1,0 +1,15 @@
+platforms:
+  webhook:
+    enabled: true
+    extra:
+      routes:
+        notify:
+          secret: casebook-placeholder-secret
+          events:
+            - push
+          prompt: "Reply with one word. Marker ROUTE-NOTIFY."
+        review:
+          secret: casebook-placeholder-secret
+          events:
+            - push
+          prompt: "Reply with one word. Marker ROUTE-REVIEW."
