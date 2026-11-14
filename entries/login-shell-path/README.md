@@ -19,29 +19,9 @@ evidence:
 - https://github.com/NousResearch/hermes-agent/blob/f0d94882e89ab8d4098b5bb2f166adfb9ee0a0ab/Dockerfile#L531
 repro: entries/login-shell-path/repro.sh
 needs_credentials: false
-confidence: reproduced
-verified_on:
-- tag: v2026.8.13
-  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
-  observed: venv-lost
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
-- tag: v0.22.5
-  digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
-  date: '2026-11-14'
-  observed: venv-lost
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
-- tag: v0.22.6
-  digest: sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d
-  date: '2026-11-14'
-  observed: venv-kept
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
-- tag: v0.23.1
-  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
-  date: '2026-11-14'
-  observed: venv-kept
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
-last_reviewed: 2026-11-13
+confidence: source-verified
+verified_on: []
+last_reviewed: '2026-11-14'
 limits: The repro runs the two shells as root through a bash entrypoint, not through the terminal tool itself. It shows which python3 a login shell finds, not every tool that depends on it.
 credits: []
 ---
@@ -52,12 +32,7 @@ The agent runs a command through the terminal tool that imports a module Hermes 
 
 ## Verified on
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `venv-lost` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
-| v0.22.5 | `venv-lost` | 2026-11-14 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
-| v0.22.6 | `venv-kept` | 2026-11-14 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
-| v0.23.1 | `venv-kept` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
+No CI run has been recorded yet. Every statement below is source reading.
 
 ## Reproduce
 
@@ -82,6 +57,7 @@ v0.22.6 adds `/etc/profile.d/hermes.sh`, which puts `/opt/data/.local/bin`, `/op
 
 - Upgrade to v0.22.6 or later.
 - On an older image, call the interpreter by its full path, `/opt/hermes/.venv/bin/python3`, in commands the agent runs, for example in a skill that tells it how to edit a file.
+- Or install the one module you need for the system interpreter into the data volume, for example with `uv pip install --python /usr/bin/python3 --target /opt/data/.local/lib/python3.<minor>/site-packages pyyaml`. An operator used this in production because it survives redeploys without changing `PATH`; it is not exercised here, and it is a second copy of the module to keep current.
 
 ## Upstream status
 
@@ -89,4 +65,4 @@ Fixed. Issue [#56634](https://github.com/NousResearch/hermes-agent/issues/56634)
 
 ## Confidence and limits
 
-Reproduced in CI on v2026.8.13, v0.22.5, v0.22.6 and v0.23.1 on 2026-11-14 ([run 43536235165](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro runs both shells as root through a bash entrypoint. The terminal tool runs as the `hermes` user, and `/etc/profile` resets `PATH` for every user, so the result is the same, but the terminal tool itself is not exercised.
+CI-PENDING. The repro runs both shells as root through a bash entrypoint. The terminal tool runs as the `hermes` user, and `/etc/profile` resets `PATH` for every user, so the result is the same, but the terminal tool itself is not exercised.
