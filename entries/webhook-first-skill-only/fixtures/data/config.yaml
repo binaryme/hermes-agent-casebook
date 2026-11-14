@@ -5,14 +5,12 @@ platforms:
       routes:
         both-listed:
           secret: casebook-placeholder-secret
-          signature: generic
           skills:
             - casebook-alpha
             - casebook-beta
           prompt: "Reply with one word. Marker ROUTE-BOTH."
         first-missing:
           secret: casebook-placeholder-secret
-          signature: generic
           skills:
             - casebook-missing
             - casebook-beta

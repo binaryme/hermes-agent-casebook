@@ -18,7 +18,6 @@ platforms:
       routes:
         smoke:
           secret: $SECRET
-          signature: generic
           prompt: "Reply with one word. Marker: SMOKE-7Q."
 EOF
 printf '{"event_type":"smoke","id":1}' >"$WORK/payload.json"

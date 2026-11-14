@@ -5,7 +5,6 @@ platforms:
       routes:
         with-skills:
           secret: casebook-placeholder-secret
-          signature: generic
           toolsets:
             - skills
           prompt: "Reply with one word."
