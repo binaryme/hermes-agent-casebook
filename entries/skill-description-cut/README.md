@@ -5,32 +5,52 @@ title: Put a skill's trigger words in the first 55 characters of its description
 kind: check-your-version
 status: fixed
 affected:
-  - v2026.8.13
-  - v0.22.5
+- v2026.8.13
+- v0.22.5
 not_affected:
-  - v0.22.6
-  - v0.23.1
+- v0.22.6
+- v0.23.1
 fixed_in: v0.22.6
 upstream:
-  - https://github.com/NousResearch/hermes-agent/issues/13944
-  - https://github.com/NousResearch/hermes-agent/issues/46024
-  - https://github.com/NousResearch/hermes-agent/issues/84195
-  - https://github.com/NousResearch/hermes-agent/issues/150523
+- https://github.com/NousResearch/hermes-agent/issues/13944
+- https://github.com/NousResearch/hermes-agent/issues/46024
+- https://github.com/NousResearch/hermes-agent/issues/84195
+- https://github.com/NousResearch/hermes-agent/issues/150523
 evidence:
-  - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/skill_utils.py#L849
-  - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/skill_utils.py#L864
-  - https://github.com/NousResearch/hermes-agent/blob/bf0203a794a07aac3ff764972ab9087baa4e4f4e/agent/skill_utils.py#L848-L851
-  - https://github.com/NousResearch/hermes-agent/blob/f0d94882e89ab8d4098b5bb2f166adfb9ee0a0ab/agent/skill_utils.py#L853-L861
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/agent/skill_utils.py#L846-L865
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/tools/skill_manager_tool.py#L172-L183
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/skill_utils.py#L849
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/skill_utils.py#L864
+- https://github.com/NousResearch/hermes-agent/blob/bf0203a794a07aac3ff764972ab9087baa4e4f4e/agent/skill_utils.py#L848-L851
+- https://github.com/NousResearch/hermes-agent/blob/f0d94882e89ab8d4098b5bb2f166adfb9ee0a0ab/agent/skill_utils.py#L853-L861
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/agent/skill_utils.py#L846-L865
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/tools/skill_manager_tool.py#L172-L183
 repro: entries/skill-description-cut/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.8.13
+  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+  date: '2026-11-14'
+  observed: hard-cut
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661
+- tag: v0.22.5
+  digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
+  date: '2026-11-14'
+  observed: hard-cut
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661
+- tag: v0.22.6
+  digest: sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d
+  date: '2026-11-14'
+  observed: word-cut
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661
+- tag: v0.23.1
+  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+  date: '2026-11-14'
+  observed: word-cut
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661
 last_reviewed: 2026-11-13
 limits: The repro measures the length of the description shown in the index, not whether a model picks the skill. Skills registered by plugins are listed differently and are not covered.
 credits:
-  - hermes-field-notes by itpartypattaya, which lists the 57-character cut as a pitfall (https://github.com/itpartypattaya/hermes-field-notes/blob/d40bdbd2fad06c01cfa2d4314680c155e6ba71cb/skills/hermes-field-notes/references/known-pitfalls.md)
+- hermes-field-notes by itpartypattaya, which lists the 57-character cut as a pitfall (https://github.com/itpartypattaya/hermes-field-notes/blob/d40bdbd2fad06c01cfa2d4314680c155e6ba71cb/skills/hermes-field-notes/references/known-pitfalls.md)
 ---
 
 ## Symptom
@@ -39,7 +59,12 @@ You write a careful `description:` with every phrase that should make the agent 
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `hard-cut` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661) |
+| v0.22.5 | `hard-cut` | 2026-11-14 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661) |
+| v0.22.6 | `word-cut` | 2026-11-14 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661) |
+| v0.23.1 | `word-cut` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661) |
 
 ## Reproduce
 
@@ -78,4 +103,4 @@ The limit is deliberate. [#13944](https://github.com/NousResearch/hermes-agent/i
 
 ## Confidence and limits
 
-Source-verified on v2026.8.13, v0.22.5, v0.22.6 and v0.23.1. Local runs of `repro.sh` on 2026-11-13 printed `hard-cut` on v2026.8.13 and `word-cut` on v0.23.1; this becomes a stamped observation only once a CI run records it. The repro measures what the index shows, not what a model does with it. Skills registered by plugins are listed with their full description, which hermes-field-notes reports for 0.21.6 and later; that path is not covered here.
+Reproduced in CI on v2026.8.13, v0.22.5, v0.22.6 and v0.23.1 on 2026-11-14 ([run 43535965661](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43535965661)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro measures what the index shows, not what a model does with it. Skills registered by plugins are listed with their full description, which hermes-field-notes reports for 0.21.6 and later; that path is not covered here.

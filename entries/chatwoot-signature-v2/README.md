@@ -5,26 +5,36 @@ title: Map Chatwoot's signature headers before pointing Chatwoot at a Hermes web
 kind: gotcha
 status: unreported
 affected:
-  - v2026.8.13
-  - v0.23.1
+- v2026.8.13
+- v0.23.1
 not_affected: []
 fixed_in: null
 upstream:
-  - https://github.com/NousResearch/hermes-agent/issues/84580
-  - https://github.com/NousResearch/hermes-agent/pull/85318
-  - https://github.com/NousResearch/hermes-agent/pull/90995
+- https://github.com/NousResearch/hermes-agent/issues/84580
+- https://github.com/NousResearch/hermes-agent/pull/85318
+- https://github.com/NousResearch/hermes-agent/pull/90995
 evidence:
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L886-L901
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L77-L80
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L70
-  - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/gateway/platforms/webhook.py#L1108-L1149
-  - https://github.com/chatwoot/chatwoot/blob/19683fae74f4d747b332b1fe6e9628da5f7e523d/lib/webhooks/trigger.rb#L44-L52
-  - https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/lib/webhooks/trigger.rb#L54-L62
-  - https://github.com/chatwoot/chatwoot/blob/a08125e283b8e15b84b5073def1e785137b059ba/lib/webhooks/trigger.rb
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L886-L901
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L77-L80
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L70
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/gateway/platforms/webhook.py#L1108-L1149
+- https://github.com/chatwoot/chatwoot/blob/19683fae74f4d747b332b1fe6e9628da5f7e523d/lib/webhooks/trigger.rb#L44-L52
+- https://github.com/chatwoot/chatwoot/blob/caab07a8f00032d5205b5a5d7e2eb0ba2f3d2d82/lib/webhooks/trigger.rb#L54-L62
+- https://github.com/chatwoot/chatwoot/blob/a08125e283b8e15b84b5073def1e785137b059ba/lib/webhooks/trigger.rb
 repro: entries/chatwoot-signature-v2/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.8.13
+  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+  date: '2026-11-14'
+  observed: 401-202-401-401
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538319997
+- tag: v0.23.1
+  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+  date: '2026-11-14'
+  observed: 401-202-401-401
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538319997
 last_reviewed: 2026-11-13
 limits: Chatwoot's side is source reading of lib/webhooks/trigger.rb, not a running Chatwoot. The repro signs requests the way that file does.
 credits: []
@@ -36,7 +46,10 @@ You point a Chatwoot webhook at a Hermes webhook route that has a secret, and ev
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `401-202-401-401` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538319997) |
+| v0.23.1 | `401-202-401-401` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538319997) |
 
 ## Reproduce
 
@@ -89,4 +102,4 @@ Unreported as such. A search on 2026-11-13 for chatwoot, `X-Chatwoot-Signature` 
 
 ## Confidence and limits
 
-Source-verified on v2026.8.13 and v0.23.1. Local runs of `repro.sh` on 2026-11-13 printed `401-202-401-401` on both tags; this becomes a stamped observation only once a CI run records it. Chatwoot itself is not run: the repro signs requests the way Chatwoot's `trigger.rb` does at the cited versions.
+Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43538319997](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538319997)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. Chatwoot itself is not run: the repro signs requests the way Chatwoot's `trigger.rb` does at the cited versions.

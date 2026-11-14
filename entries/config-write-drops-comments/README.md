@@ -5,26 +5,36 @@ title: Use v2026.9.24 or later before letting Hermes write a commented config.ya
 kind: check-your-version
 status: fixed
 affected:
-  - v2026.9.21
+- v2026.9.21
 not_affected:
-  - v2026.9.24
+- v2026.9.24
 fixed_in: v2026.9.24
 upstream:
-  - https://github.com/NousResearch/hermes-agent/issues/50698
-  - https://github.com/NousResearch/hermes-agent/issues/92554
-  - https://github.com/NousResearch/hermes-agent/issues/63039
-  - https://github.com/NousResearch/hermes-agent/issues/107511
+- https://github.com/NousResearch/hermes-agent/issues/50698
+- https://github.com/NousResearch/hermes-agent/issues/92554
+- https://github.com/NousResearch/hermes-agent/issues/63039
+- https://github.com/NousResearch/hermes-agent/issues/107511
 evidence:
-  - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L3411-L3414
-  - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/utils.py#L417-L426
-  - https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L3447-L3450
-  - https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L2016-L2020
-  - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/docker/stage2-hook.sh#L623-L632
-  - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/scripts/docker_config_migrate.py#L45-L52
+- https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L3411-L3414
+- https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/utils.py#L417-L426
+- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L3447-L3450
+- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L2016-L2020
+- https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/docker/stage2-hook.sh#L623-L632
+- https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/scripts/docker_config_migrate.py#L45-L52
 repro: entries/config-write-drops-comments/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.9.21
+  digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
+  date: '2026-11-14'
+  observed: comments-lost
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635
+- tag: v2026.9.24
+  digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+  date: '2026-11-14'
+  observed: comments-kept
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635
 last_reviewed: 2026-11-13
 limits: The repro exercises one write path, hermes config set. Other writers on v2026.9.21, and the boot-time schema migration, were read in the source and not run.
 credits: []
@@ -36,7 +46,10 @@ You annotate `config.yaml` by hand: why a limit is set, which block is disabled 
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.9.21 | `comments-lost` | 2026-11-14 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635) |
+| v2026.9.24 | `comments-kept` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635) |
 
 ## Reproduce
 
@@ -72,4 +85,4 @@ Fixed. Issues [#50698](https://github.com/NousResearch/hermes-agent/issues/50698
 
 ## Confidence and limits
 
-Source-verified on v2026.9.21 and v2026.9.24. Local runs of `repro.sh` on 2026-11-13 printed `comments-lost` on v2026.9.21 and `comments-kept` on v2026.9.24; this becomes a stamped observation only once a CI run records it. Only `hermes config set` is exercised. Tags before v2026.9.21 are not pinned here, so the entry does not say where the behavior starts.
+Reproduced in CI on v2026.9.21 and v2026.9.24 on 2026-11-14 ([run 43538073635](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. Only `hermes config set` is exercised. Tags before v2026.9.21 are not pinned here, so the entry does not say where the behavior starts.

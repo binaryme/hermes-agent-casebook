@@ -5,21 +5,31 @@ title: Use v0.21.6 or later before pointing two webhook routes at one GitHub eve
 kind: check-your-version
 status: fixed
 affected:
-  - v2026.9.24
+- v2026.9.24
 not_affected:
-  - v0.21.6
+- v0.21.6
 fixed_in: v0.21.6
 upstream: none-found
 searched_on: 2026-11-13
 evidence:
-  - https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/gateway/platforms/webhook.py#L316-L325
-  - https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/gateway/platforms/webhook.py#L620-L623
-  - https://github.com/NousResearch/hermes-agent/blob/818c13be1dc4fd28987e1e881a9408224afd4535/gateway/platforms/webhook.py#L74-L84
-  - https://github.com/NousResearch/hermes-agent/blob/818c13be1dc4fd28987e1e881a9408224afd4535/gateway/platforms/webhook.py#L357-L366
+- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/gateway/platforms/webhook.py#L316-L325
+- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/gateway/platforms/webhook.py#L620-L623
+- https://github.com/NousResearch/hermes-agent/blob/818c13be1dc4fd28987e1e881a9408224afd4535/gateway/platforms/webhook.py#L74-L84
+- https://github.com/NousResearch/hermes-agent/blob/818c13be1dc4fd28987e1e881a9408224afd4535/gateway/platforms/webhook.py#L357-L366
 repro: entries/webhook-cross-route-dedup/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.9.24
+  digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+  date: '2026-11-14'
+  observed: duplicate
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43537469117
+- tag: v0.21.6
+  digest: sha256:55e192fba0cd4fde61142abbff5adeacff40efdb482ccd0ff877924bd274f909
+  date: '2026-11-14'
+  observed: both-accepted
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43537469117
 last_reviewed: 2026-11-13
 limits: The repro sends the two deliveries one after the other from one client, not from GitHub. Only the two pinned tags around the fix are checked.
 credits: []
@@ -31,7 +41,10 @@ You add two GitHub webhooks for the same event, each to its own Hermes route, fo
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.9.24 | `duplicate` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43537469117) |
+| v0.21.6 | `both-accepted` | 2026-11-14 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43537469117) |
 
 ## Reproduce
 
@@ -62,4 +75,4 @@ Fixed in v0.21.6 by commit [30f556d0](https://github.com/NousResearch/hermes-age
 
 ## Confidence and limits
 
-Source-verified on v2026.9.24 and v0.21.6. A local run of `repro.sh` on 2026-11-13 printed `duplicate` on v2026.9.24; this becomes a stamped observation only once a CI run records it. The deliveries come from the repro, not from GitHub, and tags before v2026.9.24 are not checked here.
+Reproduced in CI on v2026.9.24 and v0.21.6 on 2026-11-14 ([run 43537469117](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43537469117)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The deliveries come from the repro, not from GitHub, and tags before v2026.9.24 are not checked here.

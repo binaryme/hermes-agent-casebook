@@ -5,22 +5,42 @@ title: Use v0.22.6 or later before relying on the image's Python from the termin
 kind: check-your-version
 status: fixed
 affected:
-  - v2026.8.13
-  - v0.22.5
+- v2026.8.13
+- v0.22.5
 not_affected:
-  - v0.22.6
-  - v0.23.1
+- v0.22.6
+- v0.23.1
 fixed_in: v0.22.6
 upstream:
-  - https://github.com/NousResearch/hermes-agent/issues/56634
+- https://github.com/NousResearch/hermes-agent/issues/56634
 evidence:
-  - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/tools/environments/base.py#L703-L707
-  - https://github.com/NousResearch/hermes-agent/blob/f0d94882e89ab8d4098b5bb2f166adfb9ee0a0ab/docker/profile-hermes-path.sh
-  - https://github.com/NousResearch/hermes-agent/blob/f0d94882e89ab8d4098b5bb2f166adfb9ee0a0ab/Dockerfile#L531
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/tools/environments/base.py#L703-L707
+- https://github.com/NousResearch/hermes-agent/blob/f0d94882e89ab8d4098b5bb2f166adfb9ee0a0ab/docker/profile-hermes-path.sh
+- https://github.com/NousResearch/hermes-agent/blob/f0d94882e89ab8d4098b5bb2f166adfb9ee0a0ab/Dockerfile#L531
 repro: entries/login-shell-path/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.8.13
+  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+  date: '2026-11-14'
+  observed: venv-lost
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
+- tag: v0.22.5
+  digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
+  date: '2026-11-14'
+  observed: venv-lost
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
+- tag: v0.22.6
+  digest: sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d
+  date: '2026-11-14'
+  observed: venv-kept
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
+- tag: v0.23.1
+  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+  date: '2026-11-14'
+  observed: venv-kept
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165
 last_reviewed: 2026-11-13
 limits: The repro runs the two shells as root through a bash entrypoint, not through the terminal tool itself. It shows which python3 a login shell finds, not every tool that depends on it.
 credits: []
@@ -32,7 +52,12 @@ The agent runs a command through the terminal tool that imports a module Hermes 
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `venv-lost` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
+| v0.22.5 | `venv-lost` | 2026-11-14 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
+| v0.22.6 | `venv-kept` | 2026-11-14 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
+| v0.23.1 | `venv-kept` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165) |
 
 ## Reproduce
 
@@ -64,4 +89,4 @@ Fixed. Issue [#56634](https://github.com/NousResearch/hermes-agent/issues/56634)
 
 ## Confidence and limits
 
-Source-verified on v2026.8.13, v0.22.5, v0.22.6 and v0.23.1. Local runs of `repro.sh` on 2026-11-13 printed `venv-lost` on v2026.8.13 and v0.22.5 and `venv-kept` on v0.23.1; this becomes a stamped observation only once a CI run records it. The repro runs both shells as root through a bash entrypoint. The terminal tool runs as the `hermes` user, and `/etc/profile` resets `PATH` for every user, so the result is the same, but the terminal tool itself is not exercised.
+Reproduced in CI on v2026.8.13, v0.22.5, v0.22.6 and v0.23.1 on 2026-11-14 ([run 43536235165](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43536235165)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro runs both shells as root through a bash entrypoint. The terminal tool runs as the `hermes` user, and `/etc/profile` resets `PATH` for every user, so the result is the same, but the terminal tool itself is not exercised.

@@ -5,25 +5,35 @@ title: Don't expect webhook runs to discover skills without the skills toolset
 kind: gotcha
 status: unreported
 affected:
-  - v2026.8.13
-  - v0.23.1
+- v2026.8.13
+- v0.23.1
 not_affected: []
 fixed_in: null
 upstream: none-found
 searched_on: 2026-11-13
 evidence:
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/agent/system_prompt.py#L307-L311
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L39
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L99-L103
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L221
-  - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L396-L409
-  - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/system_prompt.py#L412-L413
-  - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/toolsets.py#L97-L102
-  - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/toolsets.py#L640-L644
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/agent/system_prompt.py#L307-L311
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L39
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L99-L103
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L221
+- https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/gateway/platforms/webhook.py#L396-L409
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/system_prompt.py#L412-L413
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/toolsets.py#L97-L102
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/toolsets.py#L640-L644
 repro: entries/webhook-no-skills-index/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.8.13
+  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+  date: '2026-11-14'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302
+- tag: v0.23.1
+  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+  date: '2026-11-14'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302
 last_reviewed: 2026-11-13
 limits: The repro checks whether the skills index is built, not whether a model would pick a skill from it. The workaround's effect on skill_manage was read in the source, not exercised.
 credits: []
@@ -35,7 +45,10 @@ You add a skill to the skills directory, and a webhook-triggered run behaves as 
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `empty-present-present` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302) |
+| v0.23.1 | `empty-present-present` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302) |
 
 ## Reproduce
 
@@ -95,4 +108,4 @@ No upstream issue or pull request found on 2026-11-13. Searched for webhook toge
 
 ## Confidence and limits
 
-Source-verified on v2026.8.13 and v0.23.1. Local runs of `repro.sh` on 2026-11-13 printed `empty-present-present` on both tags; this becomes a stamped observation only once a CI run records it. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.
+Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43538807302](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538807302)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.
