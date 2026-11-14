@@ -40,7 +40,7 @@ No CI run has been recorded yet. Every statement below is source reading.
 
 ## Reproduce
 
-`repro.sh` writes a `config.yaml` with two comment lines at run time, so no file in this repository carries comment lines, then runs `hermes config set agent.max_turns 42` in the image with the data directory mounted. It calls `hermes` directly instead of going through the image entrypoint, so the boot-time schema migration (see Cause) cannot be what writes the file. It checks that the value was written, then counts comment lines: `comments-kept` if both remain, `comments-lost` if none do, `comments-partial` otherwise.
+`repro.sh` writes a `config.yaml` with two comment lines at run time, so no file in this repository carries comment lines, then runs `hermes config set agent.max_turns 42` in the image with the data directory mounted. It calls `hermes` directly instead of going through the image entrypoint, so the boot-time schema migration (see Cause) cannot be what writes the file; this is the same path as `docker exec <container> hermes config set`. The image's `hermes` command drops to the `hermes` user (uid 10000) before it writes, so the repro opens the data directory's permissions first and reads the result back through a second container. It checks that the value was written, then counts comment lines: `comments-kept` if both remain, `comments-lost` if none do, `comments-partial` otherwise.
 
 ## Expected vs actual
 
