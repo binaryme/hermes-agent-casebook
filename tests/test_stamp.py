@@ -1,6 +1,7 @@
 import contextlib
 import io
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -241,6 +242,30 @@ class MainTests(StampCase):
         code, _, err = self.run_main(["--results", str(results)])
         self.assertEqual(code, 2)
         self.assertIn("error:", err)
+
+
+class DownloadTests(unittest.TestCase):
+    def fake_gh(self, artifact_names):
+        calls = []
+
+        def run(command, **kwargs):
+            calls.append(command)
+            stdout = "\n".join(artifact_names) if command[:2] == ["gh", "api"] else ""
+            return subprocess.CompletedProcess(command, 0, stdout=stdout, stderr="")
+        return run, calls
+
+    def test_a_run_without_result_artifacts_downloads_nothing(self):
+        run, calls = self.fake_gh(["smoke-v1.0.0", "smoke-v1.1.0"])
+        stamp.download_run("7", "/tmp/unused", None, run)
+        self.assertEqual([command[:2] for command in calls], [["gh", "api"]])
+        self.assertIn("repos/{owner}/{repo}/actions/runs/7/artifacts", calls[0])
+
+    def test_result_artifacts_are_downloaded(self):
+        run, calls = self.fake_gh(["smoke-v1.0.0", "results-v1.0.0"])
+        stamp.download_run("7", "/tmp/target", "example/casebook", run)
+        self.assertIn("repos/example/casebook/actions/runs/7/artifacts", calls[0])
+        self.assertEqual(calls[1][:4], ["gh", "run", "download", "7"])
+        self.assertEqual(calls[1][-2:], ["--repo", "example/casebook"])
 
 
 class FrontMatterTests(unittest.TestCase):

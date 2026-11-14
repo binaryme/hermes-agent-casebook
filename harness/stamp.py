@@ -16,6 +16,7 @@ INDEX_HEADER = (
 )
 VERIFIED_HEADING = "## Verified on"
 SECTION_PATTERN = re.compile(r"^## Verified on[ \t]*\n.*?(?=^## |\Z)", re.MULTILINE | re.DOTALL)
+RESULT_ARTIFACT_PREFIX = "results-"
 NO_RUN_TEXT = "No CI run has been recorded yet. Every statement below is source reading.\n"
 
 
@@ -148,8 +149,19 @@ def render_index(fronts):
     return INDEX_HEADER + "\n".join(lines) + "\n"
 
 
+def result_artifact_names(run_id, repository=None, run=subprocess.run):
+    completed = run(
+        ["gh", "api", f"repos/{repository or '{owner}/{repo}'}/actions/runs/{run_id}/artifacts",
+         "--jq", ".artifacts[].name"],
+        capture_output=True, text=True, check=True,
+    )
+    return [name for name in completed.stdout.split() if name.startswith(RESULT_ARTIFACT_PREFIX)]
+
+
 def download_run(run_id, destination, repository=None, run=subprocess.run):
-    command = ["gh", "run", "download", str(run_id), "--dir", str(destination), "--pattern", "results-*"]
+    if not result_artifact_names(run_id, repository, run):
+        return
+    command = ["gh", "run", "download", str(run_id), "--dir", str(destination), "--pattern", f"{RESULT_ARTIFACT_PREFIX}*"]
     if repository:
         command += ["--repo", repository]
     run(command, check=True)
