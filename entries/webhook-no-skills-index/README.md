@@ -23,8 +23,18 @@ evidence:
 - https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/toolsets.py#L640-L644
 repro: entries/webhook-no-skills-index/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.8.13
+  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+  date: '2026-11-14'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+- tag: v0.23.1
+  digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+  date: '2026-11-14'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
 last_reviewed: '2026-11-14'
 limits: The repro checks whether the skills index is built, not whether a model would pick a skill from it. The workaround's effect on skill_manage was read in the source, not exercised.
 credits: []
@@ -36,7 +46,10 @@ You add a skill to the skills directory, and a webhook-triggered run behaves as 
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `empty-present-present` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| v0.23.1 | `empty-present-present` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
 
 ## Reproduce
 
@@ -96,4 +109,4 @@ No upstream issue or pull request found on 2026-11-13. Searched for webhook toge
 
 ## Confidence and limits
 
-CI-PENDING. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.
+Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.

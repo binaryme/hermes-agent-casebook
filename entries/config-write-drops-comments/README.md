@@ -28,8 +28,23 @@ evidence:
 - https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L2016-L2020
 repro: entries/config-write-drops-comments/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.8.13
+  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+  date: '2026-11-14'
+  observed: set-lost-boot-lost
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+- tag: v2026.9.21
+  digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
+  date: '2026-11-14'
+  observed: set-lost-boot-lost
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+- tag: v2026.9.24
+  digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+  date: '2026-11-14'
+  observed: set-kept-boot-kept
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
 last_reviewed: '2026-11-14'
 limits: The repro exercises two writers, hermes config set and the boot-time schema migration from version 30. Other writers, such as enabling a plugin, were read in the source and not run.
 credits: []
@@ -46,7 +61,11 @@ Every comment you wrote is gone. After the restart, the file may instead hold do
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `set-lost-boot-lost` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| v2026.9.21 | `set-lost-boot-lost` | 2026-11-14 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| v2026.9.24 | `set-kept-boot-kept` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
 
 ## Reproduce
 
@@ -94,4 +113,4 @@ Fixed. Issues [#50698](https://github.com/NousResearch/hermes-agent/issues/50698
 
 ## Confidence and limits
 
-CI-PENDING. Two writers are exercised: `config set`, and a boot migration from schema version 30. Other writers, such as enabling a plugin, are source reading only.
+Reproduced in CI on v2026.8.13, v2026.9.21 and v2026.9.24 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. Two writers are exercised: `config set`, and a boot migration from schema version 30. Other writers, such as enabling a plugin, are source reading only.

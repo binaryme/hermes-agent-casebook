@@ -23,8 +23,23 @@ evidence:
 - https://github.com/NousResearch/hermes-agent/blob/818c13be1dc4fd28987e1e881a9408224afd4535/gateway/platforms/webhook.py#L357-L366
 repro: entries/webhook-cross-route-dedup/repro.sh
 needs_credentials: false
-confidence: source-verified
-verified_on: []
+confidence: reproduced
+verified_on:
+- tag: v2026.8.13
+  digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+  date: '2026-11-14'
+  observed: duplicate
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+- tag: v2026.9.24
+  digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+  date: '2026-11-14'
+  observed: duplicate
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+- tag: v0.21.6
+  digest: sha256:55e192fba0cd4fde61142abbff5adeacff40efdb482ccd0ff877924bd274f909
+  date: '2026-11-14'
+  observed: both-accepted
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
 last_reviewed: '2026-11-14'
 limits: The repro sends the two deliveries one after the other from one client, not from GitHub. It does not cover routes with a script, where the winner can change from event to event.
 credits:
@@ -39,7 +54,11 @@ You add two GitHub webhooks for the same event, each to its own Hermes route, fo
 
 ## Verified on
 
-No CI run has been recorded yet. Every statement below is source reading.
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `duplicate` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| v2026.9.24 | `duplicate` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| v0.21.6 | `both-accepted` | 2026-11-14 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
 
 ## Reproduce
 
@@ -74,4 +93,4 @@ Fixed. Issue [#7448](https://github.com/NousResearch/hermes-agent/issues/7448), 
 
 ## Confidence and limits
 
-CI-PENDING. The deliveries come from the repro, not from GitHub, and routes with a `script` are not covered.
+Reproduced in CI on v2026.8.13, v2026.9.24 and v0.21.6 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The deliveries come from the repro, not from GitHub, and routes with a `script` are not covered.
