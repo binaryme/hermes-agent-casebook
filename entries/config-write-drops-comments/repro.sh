@@ -2,28 +2,29 @@
 set -euo pipefail
 source "$HARNESS/lib.sh"
 
-mkdir -p "$WORK/data"
-printf '%s\n' '# Operator notes, kept by hand.' 'agent:' '  # Keep runs short on this host.' '  max_turns: 30' >"$WORK/data/config.yaml"
-chmod 0777 "$WORK/data"
-chmod 0666 "$WORK/data/config.yaml"
-before=$(grep -c '^ *#' "$WORK/data/config.yaml")
-
-in_image() {
-    hermes_docker_run -v "$WORK/data:/opt/data" --entrypoint "$1" "$HERMES_IMAGE" "${@:2}"
+prepare() {
+    mkdir -p "$WORK/$1"
+    printf '%s\n' '# Operator notes, kept by hand.' 'agent:' '  # Keep runs short on this host.' '  max_turns: 30' "$2" >"$WORK/$1/config.yaml"
+    chmod 0777 "$WORK/$1"
+    chmod 0666 "$WORK/$1/config.yaml"
 }
-if ! in_image hermes config set agent.max_turns 42 >"$WORK/set.out" 2>&1; then
-    cat "$WORK/set.out" >&2
-    exit 1
-fi
-in_image cat /opt/data/config.yaml >"$WORK/after.yaml"
-grep -q 'max_turns: 42' "$WORK/after.yaml" || { echo "config set did not write the value" >&2; cat "$WORK/after.yaml" >&2; exit 1; }
-after=$(grep -c '^ *#' "$WORK/after.yaml" || true)
-echo "comment lines before: $before, after: $after" >&2
+in_image() {
+    local dir=$1 entrypoint=$2
+    shift 2
+    hermes_docker_run -v "$WORK/$dir:/opt/data" --entrypoint "$entrypoint" "$HERMES_IMAGE" "$@"
+}
+comments_after() {
+    in_image "$1" cat /opt/data/config.yaml >"$WORK/$1.after"
+    grep -q "$2" "$WORK/$1.after" || { echo "$1: the write did not happen" >&2; cat "$WORK/$1.after" >&2; exit 1; }
+    if grep -qF '# Operator notes, kept by hand.' "$WORK/$1.after" && grep -qF '# Keep runs short on this host.' "$WORK/$1.after"; then echo kept; else echo lost; fi
+}
 
-if [ "$after" -eq "$before" ]; then
-    observed comments-kept
-elif [ "$after" -eq 0 ]; then
-    observed comments-lost
-else
-    observed comments-partial
-fi
+prepare set ''
+in_image set hermes config set agent.max_turns 42 >"$WORK/set.out" 2>&1 || { cat "$WORK/set.out" >&2; exit 1; }
+set_result=$(comments_after set 'max_turns: 42')
+
+prepare boot '_config_version: 30'
+hermes_exec_data "$WORK/boot" --version >"$WORK/boot.out" 2>&1 || { cat "$WORK/boot.out" >&2; exit 1; }
+boot_result=$(comments_after boot '_config_version: ')
+grep -q '^_config_version: 30$' "$WORK/boot.after" && { echo "the boot did not migrate the config" >&2; exit 1; }
+observed "set-$set_result-boot-$boot_result"

@@ -5,6 +5,7 @@ title: Use v2026.9.24 or later before letting Hermes write a commented config.ya
 kind: check-your-version
 status: fixed
 affected:
+- v2026.8.13
 - v2026.9.21
 not_affected:
 - v2026.9.24
@@ -15,69 +16,77 @@ upstream:
 - https://github.com/NousResearch/hermes-agent/issues/63039
 - https://github.com/NousResearch/hermes-agent/issues/107511
 evidence:
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/hermes_cli/config.py#L5277
+- https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/utils.py#L475-L535
 - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L3411-L3414
+- https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L1305-L1310
+- https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L2372-L2410
 - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/utils.py#L417-L426
-- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L3447-L3450
-- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L2016-L2020
 - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/docker/stage2-hook.sh#L623-L632
 - https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/scripts/docker_config_migrate.py#L45-L52
+- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L3447-L3450
+- https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L2016-L2020
 repro: entries/config-write-drops-comments/repro.sh
 needs_credentials: false
-confidence: reproduced
-verified_on:
-- tag: v2026.9.21
-  digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
-  date: '2026-11-14'
-  observed: comments-lost
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635
-- tag: v2026.9.24
-  digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
-  date: '2026-11-14'
-  observed: comments-kept
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635
-last_reviewed: 2026-11-13
-limits: The repro exercises one write path, hermes config set. Other writers on v2026.9.21, and the boot-time schema migration, were read in the source and not run.
+confidence: source-verified
+verified_on: []
+last_reviewed: '2026-11-14'
+limits: The repro exercises two writers, hermes config set and the boot-time schema migration from version 30. Other writers, such as enabling a plugin, were read in the source and not run.
 credits: []
 ---
 
 ## Symptom
 
-You annotate `config.yaml` by hand: why a limit is set, which block is disabled and why. After one `hermes config set`, or anything else that writes the config, every comment is gone. Nothing warns you, and the values themselves are still right, so it is easy to notice weeks later.
+You annotate `config.yaml` by hand: why a limit is set, which block is disabled and why. Then one of two things happens:
+
+- you run `hermes config set`, or
+- the container restarts after an image upgrade.
+
+Every comment you wrote is gone. After the restart, the file may instead hold dozens of comment lines you never wrote: default boilerplate that replaced yours. Nothing warns you, and the values themselves are still right, so it is easy to notice weeks later.
 
 ## Verified on
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.9.21 | `comments-lost` | 2026-11-14 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635) |
-| v2026.9.24 | `comments-kept` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635) |
+No CI run has been recorded yet. Every statement below is source reading.
 
 ## Reproduce
 
-`repro.sh` writes a `config.yaml` with two comment lines at run time, so no file in this repository carries comment lines, then runs `hermes config set agent.max_turns 42` in the image with the data directory mounted. It calls `hermes` directly instead of going through the image entrypoint, so the boot-time schema migration (see Cause) cannot be what writes the file; this is the same path as `docker exec <container> hermes config set`. The image's `hermes` command drops to the `hermes` user (uid 10000) before it writes, so the repro opens the data directory's permissions first and reads the result back through a second container. It checks that the value was written, then counts comment lines: `comments-kept` if both remain, `comments-lost` if none do, `comments-partial` otherwise.
+`repro.sh` writes a `config.yaml` with two comment lines at run time, so no file in this repository carries comment lines. It then checks two writers, each on its own copy:
+
+1. `hermes config set agent.max_turns 42`, run directly, the same path as `docker exec <container> hermes config set`. It skips the image entrypoint, so the boot migration cannot interfere.
+2. A normal boot through the image entrypoint, with `_config_version: 30` in the file, so the boot-time schema migration runs. The repro fails as a repro error if the version did not change.
+
+The image's `hermes` command drops to the `hermes` user (uid 10000) before it writes. So the repro opens the data directory's permissions first, and reads the result back through a second container. For each writer it checks whether both original comment lines are still present, by exact text, so boilerplate comments added by the writer cannot pass for the operator's. It prints `set-<kept|lost>-boot-<kept|lost>`.
 
 ## Expected vs actual
 
-| Tag | Comment lines after `config set` | Token |
-| --- | --- | --- |
-| v2026.9.21 | 0 of 2 | `comments-lost` |
-| v2026.9.24 | 2 of 2 | `comments-kept` |
+| Tag | `config set` | Boot migration | Token |
+| --- | --- | --- | --- |
+| v2026.8.13, v2026.9.21 | comments lost | comments lost | `set-lost-boot-lost` |
+| v2026.9.24 | kept | kept | `set-kept-boot-kept` |
+
+In local runs on 2026-11-13 and 2026-11-14 the boot migrated the file from schema 30 to 34 on v2026.8.13, to 45 on v2026.9.21 and to 46 on v2026.9.24. On v2026.9.21 it left 36 comment lines of default boilerplate in place of the two original ones. These counts are from local runs, not from the repro.
 
 ## Cause
 
-On v2026.9.21, `config set` writes the raw user config through `_write_user_config`, which calls `atomic_yaml_write` ([config.py L3411-L3414](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L3411-L3414)), a plain PyYAML `yaml.dump` of the parsed data ([utils.py L417-L426](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/utils.py#L417-L426)). Parsing drops comments, so the dump has none. A comment-preserving ruamel writer already existed in that release's `utils.py`, but `config set` did not use it.
+On v2026.8.13 and v2026.9.21, `config set` writes the raw user config through `atomic_yaml_write` ([v2026.8.13 config.py L5277](https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/hermes_cli/config.py#L5277); [v2026.9.21 L3411-L3414](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L3411-L3414)). That function is a plain PyYAML `yaml.dump` of the parsed data ([v2026.8.13 utils.py L475-L535](https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/utils.py#L475-L535); [v2026.9.21 L417-L426](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/utils.py#L417-L426)). Parsing drops comments, so the dump has none of yours. A comment-preserving ruamel writer already existed in v2026.9.21's `utils.py`, but `config set` did not use it.
 
-From v2026.9.24, `_write_user_config` calls `atomic_config_write` ([config.py L3447-L3450](https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L3447-L3450)), described as "THE config.yaml writer: fail-closed ... and comment-preserving (ruamel round-trip merge of data onto the on-disk document)" ([L2016-L2020](https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L2016-L2020)).
+The boot migration is a second writer. The image's stage2 hook runs `scripts/docker_config_migrate.py` whenever `config.yaml` exists ([stage2-hook.sh L623-L632](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/docker/stage2-hook.sh#L623-L632)). That script does nothing in three cases ([docker_config_migrate.py L45-L52](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/scripts/docker_config_migrate.py#L45-L52)):
 
-A second writer runs at container boot. The image's stage2 hook runs `scripts/docker_config_migrate.py` whenever `config.yaml` exists ([stage2-hook.sh L623-L632](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/docker/stage2-hook.sh#L623-L632)). It does nothing when `HERMES_SKIP_CONFIG_MIGRATION` is set or the config is already at the current schema version ([docker_config_migrate.py L45-L52](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/scripts/docker_config_migrate.py#L45-L52)), and otherwise snapshots the config into `backups/config/` before migrating it. In local runs on 2026-11-13, booting each image once on the same two-comment config gave:
+- `HERMES_SKIP_CONFIG_MIGRATION` is set;
+- the config is already at the image's schema version;
+- the config is older than the version-12 support floor.
 
-- v2026.9.21 refused to migrate a config with no `_config_version` ("predates version 12") and left both comments.
-- v2026.9.24 migrated it from schema 0 to 46, wrote a `pre-docker-migrate` backup, and kept both comments.
+Otherwise it migrates. On v2026.9.21 the migration persists through `save_config` ([L1305-L1310](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L1305-L1310)), which writes with the same `atomic_yaml_write` and appends commented default sections ([L2372-L2410](https://github.com/NousResearch/hermes-agent/blob/d337b736aa1e8ebecfab043842d13e4a2d2f48a3/hermes_cli/config.py#L2372-L2410)). Every image upgrade that raises the schema version therefore rewrites your file.
+
+From v2026.9.24, `_write_user_config` calls `atomic_config_write` ([config.py L3447-L3450](https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L3447-L3450)). Its docstring calls it "THE config.yaml writer", comment-preserving through a ruamel round-trip, and says `save_config`, `config set` and migrations all go through it ([L2016-L2020](https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/hermes_cli/config.py#L2016-L2020)).
 
 ## Workaround
 
 - Upgrade to v2026.9.24 or later before you let anything write the config.
-- On v2026.9.21 or earlier, keep the annotated copy outside the data volume, under version control, and treat `config.yaml` on the volume as generated. Diff the two after every `config set`, plugin enable or upgrade.
-- Set `HERMES_SKIP_CONFIG_MIGRATION=1` if you want schema migrations to happen only when you run them yourself, and look in `backups/config/` after a boot that did migrate.
+- On v2026.9.21 or earlier, set `HERMES_SKIP_CONFIG_MIGRATION=1` on the container, so an image upgrade does not rewrite the file at boot. Run migrations yourself, after taking a copy.
+- On those versions, also keep the annotated copy outside the data volume, under version control, and treat `config.yaml` on the volume as generated. Diff the two after every `config set`, plugin enable or upgrade.
+- Edit the file by parsing and dumping it yourself, never by text replacement, and expect the comments to go either way until you upgrade.
+- After a boot that migrated, the previous file is kept as a backup. On v2026.8.13 the local run left it next to the config as `config.yaml.bak-<timestamp>`; on v2026.9.21 and v2026.9.24 it was under `backups/config/` as `config.yaml.pre-docker-migrate.<timestamp>`.
 
 ## Upstream status
 
@@ -85,4 +94,4 @@ Fixed. Issues [#50698](https://github.com/NousResearch/hermes-agent/issues/50698
 
 ## Confidence and limits
 
-Reproduced in CI on v2026.9.21 and v2026.9.24 on 2026-11-14 ([run 43538073635](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43538073635)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. Only `hermes config set` is exercised. Tags before v2026.9.21 are not pinned here, so the entry does not say where the behavior starts.
+CI-PENDING. Two writers are exercised: `config set`, and a boot migration from schema version 30. Other writers, such as enabling a plugin, are source reading only.
