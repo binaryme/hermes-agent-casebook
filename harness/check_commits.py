@@ -9,7 +9,7 @@ HEADER_PATTERN = re.compile(r"^(?:" + "|".join(TYPES) + r")(?:\([a-z0-9-]+\))?!?
 MAX_HEADER_LENGTH = 100
 TRAILER_PATTERN = re.compile(r"^([A-Za-z][A-Za-z0-9-]*): .+$")
 ALLOWED_TRAILERS = {"signed-off-by"}
-FORBIDDEN_TEXT = re.compile(r"^\s*co-authored-by:|\bgenerated with\b", re.IGNORECASE | re.MULTILINE)
+FORBIDDEN_TEXT = re.compile(r"^\s*co-authored-by:|^\W*generated with\b", re.IGNORECASE | re.MULTILINE)
 RECORD_SEPARATOR = "\x1e"
 FIELD_SEPARATOR = "\x1f"
 

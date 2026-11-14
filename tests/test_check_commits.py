@@ -49,6 +49,12 @@ class MessageTests(unittest.TestCase):
     def test_generated_with_line_fails(self):
         self.assert_problem(GOOD + "\nGenerated with some tool\n", "generator")
 
+    def test_a_generator_footer_with_a_leading_symbol_fails(self):
+        self.assert_problem(GOOD + "\n\u2728 Generated with some tool\n", "generator")
+
+    def test_quoting_the_phrase_inside_a_sentence_is_fine(self):
+        self.assert_clean('ci: check trailers\n\nIt fails a message with a "generated with" line anywhere.\n')
+
     def test_other_trailers_fail(self):
         self.assert_problem(GOOD + "\nReviewed-by: Someone <someone@example.com>\n", "Reviewed-by")
 
