@@ -24,8 +24,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: repro-${{ github.ref }}
-  cancel-in-progress: true
+  group: repro-${{ github.ref }}-${{ github.event_name }}-${{ inputs.entry }}-${{ inputs.tag }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   plan:
