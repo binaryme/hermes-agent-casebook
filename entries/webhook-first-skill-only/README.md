@@ -22,14 +22,14 @@ confidence: reproduced
 verified_on:
 - tag: v2026.8.13
   digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: alpha-only-beta-only
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v0.23.1
   digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: alpha-only-beta-only
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 last_reviewed: '2026-11-14'
 limits: The repro checks which skill bodies reach the model's input, not how a model would act on them. It covers list values only; scalar values are the separate bug in issue 124447.
 credits:
@@ -59,10 +59,10 @@ It sends one signed request to each route and checks which markers reached the s
 
 ### Runs
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `alpha-only-beta-only` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v0.23.1 | `alpha-only-beta-only` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| Tag | Observed | Date | Digest | Run | Transcript |
+| --- | --- | --- | --- | --- | --- |
+| v2026.8.13 | `alpha-only-beta-only` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-first-skill-only/v2026.8.13.log) |
+| v0.23.1 | `alpha-only-beta-only` | 2026-11-15 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-first-skill-only/v0.23.1.log) |
 
 ### Expected and observed
 
@@ -72,6 +72,13 @@ It sends one signed request to each route and checks which markers reached the s
 | `first-missing` | `beta-only` | `beta-only` |
 
 The docs describe the field as a "List of skill names to load for the agent run" ([webhooks.md L87 at v0.23.1](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/website/docs/user-guide/messaging/webhooks.md?plain=1#L87)). `expect.json` records `alpha-only-beta-only` on v2026.8.13 and v0.23.1.
+
+### Field observation
+
+On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 (UTC−6) with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands.
+
+- One route lists three skills under `skills:`. Across every session that route started in three months, several hundred, the body of the first skill is in the injected message of 98% and the bodies of the second and third skills are in none.
+- The usage counters agree: the first skill counts a use on every run, the other two only when a person loaded them by hand on a chat platform. The operator had noticed that the second skill was rarely used and had not found why.
 
 ## Analysis
 
@@ -89,4 +96,4 @@ Open. Pull request [#139223](https://github.com/NousResearch/hermes-agent/pull/1
 
 ## Threats to validity
 
-Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro inspects the model's input only. When pull request 139223 or another fix ships, the expected token for that tag becomes `both-beta-only`.
+Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-15 ([run 43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222); transcripts in [evidence/43665652222](../../evidence/43665652222/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro inspects the model's input only. When pull request 139223 or another fix ships, the expected token for that tag becomes `both-beta-only`.

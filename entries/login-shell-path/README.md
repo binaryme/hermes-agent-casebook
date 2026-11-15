@@ -23,24 +23,24 @@ confidence: reproduced
 verified_on:
 - tag: v2026.8.13
   digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: venv-lost
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v0.22.5
   digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: venv-lost
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v0.22.6
   digest: sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: venv-kept
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v0.23.1
   digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: venv-kept
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 last_reviewed: '2026-11-14'
 limits: The repro runs the two shells as root through a bash entrypoint, not through the terminal tool itself. It shows which python3 a login shell finds, not every tool that depends on it.
 credits: []
@@ -62,12 +62,12 @@ Before v0.22.6, a login shell in the image resolves `python3` outside the image'
 
 ### Runs
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `venv-lost` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v0.22.5 | `venv-lost` | 2026-11-14 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v0.22.6 | `venv-kept` | 2026-11-14 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v0.23.1 | `venv-kept` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| Tag | Observed | Date | Digest | Run | Transcript |
+| --- | --- | --- | --- | --- | --- |
+| v2026.8.13 | `venv-lost` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/login-shell-path/v2026.8.13.log) |
+| v0.22.5 | `venv-lost` | 2026-11-15 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/login-shell-path/v0.22.5.log) |
+| v0.22.6 | `venv-kept` | 2026-11-15 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/login-shell-path/v0.22.6.log) |
+| v0.23.1 | `venv-kept` | 2026-11-15 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/login-shell-path/v0.23.1.log) |
 
 ### Expected and observed
 
@@ -77,6 +77,13 @@ Before v0.22.6, a login shell in the image resolves `python3` outside the image'
 | v0.22.6, v0.23.1 | `/opt/hermes/.venv/bin/python3` | `venv-kept` |
 
 A local run on v2026.8.13 on 2026-11-13 also showed the login `PATH` as `/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin` and `python3 -c "import yaml"` failing with `ModuleNotFoundError: No module named 'yaml'`.
+
+### Field observation
+
+On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 (UTC−6) with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands.
+
+- In the running gateway, `bash -c 'command -v python3'` as the `hermes` user gives `/opt/hermes/.venv/bin/python3`, and `bash -l -c` gives `/usr/bin/python3`, as on v2026.8.13 in CI.
+- The operator had installed PyYAML for the system interpreter into the data volume, with the `uv pip install --target` command in the recommendation. In the login shell, `/usr/bin/python3` imports `yaml` from under `/opt/data`.
 
 ## Analysis
 
@@ -88,7 +95,7 @@ v0.22.6 adds `/etc/profile.d/hermes.sh`, which puts `/opt/data/.local/bin`, `/op
 
 - Upgrade to v0.22.6 or later.
 - On an older image, call the interpreter by its full path, `/opt/hermes/.venv/bin/python3`, in commands the agent runs, for example in a skill that tells it how to edit a file.
-- Or install the one module you need for the system interpreter into the data volume, for example with `uv pip install --python /usr/bin/python3 --target /opt/data/.local/lib/python3.<minor>/site-packages pyyaml`. An operator used this in production because it survives redeploys without changing `PATH`; it is not exercised here, and it is a second copy of the module to keep current.
+- Or install the one module you need for the system interpreter into the data volume, for example with `uv pip install --python /usr/bin/python3 --target /opt/data/.local/lib/python3.<minor>/site-packages pyyaml`. It survives redeploys without changing `PATH`. The repro does not exercise it; the field observation above shows it working on one v2026.8.13 install. It is a second copy of the module to keep current.
 
 ## Related work
 
@@ -96,4 +103,4 @@ Fixed. Issue [#56634](https://github.com/NousResearch/hermes-agent/issues/56634)
 
 ## Threats to validity
 
-Reproduced in CI on v2026.8.13, v0.22.5, v0.22.6 and v0.23.1 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro runs both shells as root through a bash entrypoint. The terminal tool runs as the `hermes` user, and `/etc/profile` resets `PATH` for every user, so the result is the same, but the terminal tool itself is not exercised.
+Reproduced in CI on v2026.8.13, v0.22.5, v0.22.6 and v0.23.1 on 2026-11-15 ([run 43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222); transcripts in [evidence/43665652222](../../evidence/43665652222/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro runs both shells as root through a bash entrypoint. The terminal tool runs as the `hermes` user, and `/etc/profile` resets `PATH` for every user, so the result is the same, but the terminal tool itself is not exercised. The field observation ran both shells as `hermes` in a running gateway and got the same result.

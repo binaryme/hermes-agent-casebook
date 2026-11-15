@@ -1,0 +1,12 @@
+{
+  "slug": "chatwoot-signature-v2",
+  "tag": "v0.23.1",
+  "digest": "sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08",
+  "token": "401-202-401-401",
+  "expected": "401-202-401-401",
+  "class": "match",
+  "duration_s": 12.268,
+  "runner": "Linux-X64",
+  "timestamp_utc": "2026-11-15T02:02:34Z",
+  "run_url": "https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222"
+}

@@ -27,14 +27,14 @@ confidence: reproduced
 verified_on:
 - tag: v2026.8.13
   digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: empty-present-present
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v0.23.1
   digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: empty-present-present
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 last_reviewed: '2026-11-14'
 limits: The repro checks whether the skills index is built, not whether a model would pick a skill from it. The workaround's effect on skill_manage was read in the source, not exercised.
 credits: []
@@ -62,10 +62,10 @@ It prints `OBSERVED=<default>-<platform workaround>-<route workaround>`, each pa
 
 ### Runs
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `empty-present-present` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v0.23.1 | `empty-present-present` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| Tag | Observed | Date | Digest | Run | Transcript |
+| --- | --- | --- | --- | --- | --- |
+| v2026.8.13 | `empty-present-present` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-no-skills-index/v2026.8.13.log) |
+| v0.23.1 | `empty-present-present` | 2026-11-15 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-no-skills-index/v0.23.1.log) |
 
 ### Expected and observed
 
@@ -76,6 +76,14 @@ It prints `OBSERVED=<default>-<platform workaround>-<route workaround>`, each pa
 | Route `toolsets: [hermes-webhook, skills]` | listed | `present` |
 
 `expect.json` records `empty-present-present` on v2026.8.13 and v0.23.1.
+
+### Field observation
+
+On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 (UTC−6) with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands.
+
+- `hermes prompt-size --platform cli` lists 95 skills in a 9,794-character index; `--platform webhook` on the same install gives a 0-character index.
+- Every webhook route that needs a skill names it under `skills:`; no route and no platform setting adds the `skills` toolset. That is the workaround without `skill_manage`.
+- Two skills on the install were written by the agent itself (`created_by: agent` in the usage file), from chat platforms that have the skill tools. A skill the agent writes is persistent and is offered to every platform afterwards, which is the risk the recommendation weighs.
 
 ## Analysis
 
@@ -115,4 +123,4 @@ No upstream issue or pull request found on 2026-11-13. Searched for webhook toge
 
 ## Threats to validity
 
-Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.
+Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-15 ([run 43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222); transcripts in [evidence/43665652222](../../evidence/43665652222/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.

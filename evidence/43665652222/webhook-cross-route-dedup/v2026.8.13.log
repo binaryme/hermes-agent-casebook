@@ -1,0 +1,17 @@
+entry: webhook-cross-route-dedup
+tag: v2026.8.13
+digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+class: match
+token: duplicate
+expected: duplicate
+exit: 0
+duration_s: 7.881
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:04:19Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+
+--- stdout ---
+OBSERVED=duplicate
+
+--- stderr ---
+EVIDENCE same X-GitHub-Delivery to two routes: notify status 202, review status 200, review body {"status": "duplicate", "delivery_id": "casebook-1794708258-4355"}

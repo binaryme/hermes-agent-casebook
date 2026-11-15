@@ -27,19 +27,19 @@ confidence: reproduced
 verified_on:
 - tag: v2026.8.13
   digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: duplicate
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v2026.9.24
   digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: duplicate
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v0.21.6
   digest: sha256:55e192fba0cd4fde61142abbff5adeacff40efdb482ccd0ff877924bd274f909
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: both-accepted
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 last_reviewed: '2026-11-14'
 limits: The repro sends the two deliveries one after the other from one client, not from GitHub. It does not cover routes with a script, where the winner can change from event to event.
 credits:
@@ -64,11 +64,11 @@ On affected tags the webhook gateway deduplicates deliveries by delivery id alon
 
 ### Runs
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `duplicate` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v2026.9.24 | `duplicate` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v0.21.6 | `both-accepted` | 2026-11-14 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| Tag | Observed | Date | Digest | Run | Transcript |
+| --- | --- | --- | --- | --- | --- |
+| v2026.8.13 | `duplicate` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-cross-route-dedup/v2026.8.13.log) |
+| v2026.9.24 | `duplicate` | 2026-11-15 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-cross-route-dedup/v2026.9.24.log) |
+| v0.21.6 | `both-accepted` | 2026-11-15 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-cross-route-dedup/v0.21.6.log) |
 
 ### Expected and observed
 
@@ -76,6 +76,12 @@ On affected tags the webhook gateway deduplicates deliveries by delivery id alon
 | --- | --- | --- |
 | v2026.8.13, v2026.9.24 | `200 {"status": "duplicate"}` | `duplicate` |
 | v0.21.6 | `202 accepted` | `both-accepted` |
+
+### Field observation
+
+On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 (UTC−6) with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands.
+
+- Two GitHub hooks on one repository sent `pull_request` events to two routes. The gateway log has 60 `Skipping duplicate delivery` lines over five days, 2026-08-16 to 2026-08-20. On 2026-08-21 the operator left one hook per event; after that, the log has one more such line in almost three months.
 
 ## Analysis
 
@@ -99,4 +105,4 @@ Fixed. Issue [#7448](https://github.com/NousResearch/hermes-agent/issues/7448), 
 
 ## Threats to validity
 
-Reproduced in CI on v2026.8.13, v2026.9.24 and v0.21.6 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The deliveries come from the repro, not from GitHub, and routes with a `script` are not covered.
+Reproduced in CI on v2026.8.13, v2026.9.24 and v0.21.6 on 2026-11-15 ([run 43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222); transcripts in [evidence/43665652222](../../evidence/43665652222/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The deliveries come from the repro, not from GitHub, and routes with a `script` are not covered.

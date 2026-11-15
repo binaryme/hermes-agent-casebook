@@ -32,19 +32,19 @@ confidence: reproduced
 verified_on:
 - tag: v2026.8.13
   digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: set-lost-boot-lost
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v2026.9.21
   digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: set-lost-boot-lost
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 - tag: v2026.9.24
   digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
-  date: '2026-11-14'
+  date: '2026-11-15'
   observed: set-kept-boot-kept
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
 last_reviewed: '2026-11-14'
 limits: The repro exercises two writers, hermes config set and the boot-time schema migration from version 30. Other writers, such as enabling a plugin, were read in the source and not run.
 credits: []
@@ -76,11 +76,11 @@ The image's `hermes` command drops to the `hermes` user (uid 10000) before it wr
 
 ### Runs
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `set-lost-boot-lost` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v2026.9.21 | `set-lost-boot-lost` | 2026-11-14 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v2026.9.24 | `set-kept-boot-kept` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| Tag | Observed | Date | Digest | Run | Transcript |
+| --- | --- | --- | --- | --- | --- |
+| v2026.8.13 | `set-lost-boot-lost` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/config-write-drops-comments/v2026.8.13.log) |
+| v2026.9.21 | `set-lost-boot-lost` | 2026-11-15 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/config-write-drops-comments/v2026.9.21.log) |
+| v2026.9.24 | `set-kept-boot-kept` | 2026-11-15 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/config-write-drops-comments/v2026.9.24.log) |
 
 ### Expected and observed
 
@@ -89,7 +89,13 @@ The image's `hermes` command drops to the `hermes` user (uid 10000) before it wr
 | v2026.8.13, v2026.9.21 | comments lost | comments lost | `set-lost-boot-lost` |
 | v2026.9.24 | kept | kept | `set-kept-boot-kept` |
 
-In local runs on 2026-11-13 and 2026-11-14 the boot migrated the file from schema 30 to 34 on v2026.8.13, to 45 on v2026.9.21 and to 46 on v2026.9.24. On v2026.9.21 it left 36 comment lines of default boilerplate in place of the two original ones. These counts are from local runs, not from the repro.
+The transcripts of the stamped run show the boot migrating the file from schema 30 to 34 on v2026.8.13, to 45 on v2026.9.21 and to 46 on v2026.9.24. On v2026.8.13 and v2026.9.21 the migrated file has 41 lines, 36 of them comments, all default boilerplate, and neither original comment; on v2026.9.24 it keeps both. `config set` on the affected tags leaves a 2-line file with no comments.
+
+### Field observation
+
+On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 (UTC−6) with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands.
+
+- The install's `config.yaml` has no comment lines left, and 55 backup copies named `config.yaml.bak*` sit next to it, some written by boot migrations and some by hand. The operator had annotated the file by hand and had seen the comments disappear after restarts.
 
 ## Analysis
 
@@ -119,4 +125,4 @@ Fixed. Issues [#50698](https://github.com/NousResearch/hermes-agent/issues/50698
 
 ## Threats to validity
 
-Reproduced in CI on v2026.8.13, v2026.9.21 and v2026.9.24 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. Two writers are exercised: `config set`, and a boot migration from schema version 30. Other writers, such as enabling a plugin, are source reading only.
+Reproduced in CI on v2026.8.13, v2026.9.21 and v2026.9.24 on 2026-11-15 ([run 43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222); transcripts in [evidence/43665652222](../../evidence/43665652222/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. Two writers are exercised: `config set`, and a boot migration from schema version 30. Other writers, such as enabling a plugin, are source reading only.

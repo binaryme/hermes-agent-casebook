@@ -1,0 +1,18 @@
+entry: login-shell-path
+tag: v2026.8.13
+digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+class: match
+token: venv-lost
+expected: venv-lost
+exit: 0
+duration_s: 0.383
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:03:37Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+
+--- stdout ---
+OBSERVED=venv-lost
+
+--- stderr ---
+EVIDENCE bash -c: python3 is /opt/hermes/.venv/bin/python3; bash -l -c: python3 is /usr/bin/python3
+EVIDENCE bash -l -c PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
