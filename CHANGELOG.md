@@ -6,6 +6,21 @@ Entries that are removed because they no longer apply to any supported tag are l
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-15
+
+### Corrected
+
+Found by a second review of 1.0.0, against the entries and the run transcripts.
+
+- Every entry now runs on all seven pinned tags, not only on the tags where its behavior was expected to change: 49 entry and tag pairs, all matching, in a new run whose evidence replaces the 1.0.0 run's. E1, E2 and E3 are now shown present on all seven tags, and the "before" ranges of E6, E7 and E9 cover every pinned tag in between.
+- E7: on v0.21.6 and v0.22.5 the login shell finds `/usr/local/bin/python3`, not `/usr/bin/python3`. The repro now checks whether that interpreter can import `openai`, a dependency only the image's virtualenv has, so "without Hermes' dependencies" is observed, not inferred. The `uv pip install --target` workaround names the right interpreter per tag.
+- E6: the backup file names and the schema versions on every tag come from transcripts; they came from local runs before.
+- E4 field observation: counted against the real 60-character limit, not 57, and checked against the index lines Hermes reports.
+- Hypotheses: E1's falsification names the prompt-size case it tests, E3's covers the tampered and stale requests, and E7's no longer claims what the repro does not test.
+- THESIS.md: the abstract no longer counts E4 as fixed; "fixed in" is the first fixed tag among the pinned ones; the declaration and section 3.8 say E3 was not compared with the author's install; RQ3 says which workarounds were exercised; the log claims are marked as source reading; the description advice matches E4.
+- Field observations: context from the operator is marked as the operator's account, and a session count that showed traffic volume is removed.
+- Result tables in E1 and E2 say "Observed", not "What the source does".
+
 ## [1.0.0] - 2026-11-15
 
 ### Added
@@ -23,7 +38,7 @@ Entries that are removed because they no longer apply to any supported tag are l
 
 - Entry headings follow a thesis results section: Observation, Hypothesis, Method, Results, Analysis, Recommendation, Related work, Threats to validity. The validator and `stamp.py` enforce and write the new layout.
 
-### Corrected
+### Corrected before release
 
 - E6: the boot-time schema migration also drops comments on v2026.8.13 and v2026.9.21, not only `config set`.
 - E9: upstream issue #7448 and pull requests #130692 and #129626 were missed; they are linked and credited.
@@ -47,7 +62,8 @@ Entries that are removed because they no longer apply to any supported tag are l
 - Issue forms for new entries and wrong entries, and a pull request template.
 - Citation metadata and this changelog.
 
-[Unreleased]: https://github.com/binaryme/hermes-agent-casebook/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/binaryme/hermes-agent-casebook/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/binaryme/hermes-agent-casebook/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/binaryme/hermes-agent-casebook/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/binaryme/hermes-agent-casebook/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/binaryme/hermes-agent-casebook/releases/tag/v0.1.0
