@@ -34,37 +34,37 @@ verified_on:
   digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
   date: '2026-11-15'
   observed: hard-cut
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 - tag: v2026.9.21
   digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
   date: '2026-11-15'
   observed: hard-cut
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 - tag: v2026.9.24
   digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
   date: '2026-11-15'
   observed: hard-cut
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 - tag: v0.21.6
   digest: sha256:55e192fba0cd4fde61142abbff5adeacff40efdb482ccd0ff877924bd274f909
   date: '2026-11-15'
   observed: hard-cut
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 - tag: v0.22.5
   digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
   date: '2026-11-15'
   observed: hard-cut
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 - tag: v0.22.6
   digest: sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d
   date: '2026-11-15'
   observed: word-cut
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 - tag: v0.23.1
   digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
   date: '2026-11-15'
   observed: word-cut
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 last_reviewed: '2026-11-14'
 limits: The repro measures the length of the description shown in the index, not whether a model picks the skill. Skills registered by plugins are listed differently and are not covered.
 credits:
@@ -96,13 +96,13 @@ The difference between the two index lines, plus 40, is the length of the descri
 
 | Tag | Observed | Date | Digest | Run | Transcript |
 | --- | --- | --- | --- | --- | --- |
-| v2026.8.13 | `hard-cut` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/skill-description-cut/v2026.8.13.log) |
-| v2026.9.21 | `hard-cut` | 2026-11-15 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/skill-description-cut/v2026.9.21.log) |
-| v2026.9.24 | `hard-cut` | 2026-11-15 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/skill-description-cut/v2026.9.24.log) |
-| v0.21.6 | `hard-cut` | 2026-11-15 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/skill-description-cut/v0.21.6.log) |
-| v0.22.5 | `hard-cut` | 2026-11-15 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/skill-description-cut/v0.22.5.log) |
-| v0.22.6 | `word-cut` | 2026-11-15 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/skill-description-cut/v0.22.6.log) |
-| v0.23.1 | `word-cut` | 2026-11-15 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/skill-description-cut/v0.23.1.log) |
+| v2026.8.13 | `hard-cut` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/skill-description-cut/v2026.8.13.log) |
+| v2026.9.21 | `hard-cut` | 2026-11-15 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/skill-description-cut/v2026.9.21.log) |
+| v2026.9.24 | `hard-cut` | 2026-11-15 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/skill-description-cut/v2026.9.24.log) |
+| v0.21.6 | `hard-cut` | 2026-11-15 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/skill-description-cut/v0.21.6.log) |
+| v0.22.5 | `hard-cut` | 2026-11-15 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/skill-description-cut/v0.22.5.log) |
+| v0.22.6 | `word-cut` | 2026-11-15 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/skill-description-cut/v0.22.6.log) |
+| v0.23.1 | `word-cut` | 2026-11-15 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/skill-description-cut/v0.23.1.log) |
 
 ### Expected and observed
 
@@ -113,9 +113,9 @@ The difference between the two index lines, plus 40, is the length of the descri
 
 ### Field observation
 
-On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 (UTC−6) with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands.
+On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands. Statements marked *operator's account* come from the operator, not from a command.
 
-- 18 of the install's 19 operator-written skill descriptions are longer than 57 characters, so on v2026.8.13 the index shows each one cut.
+- 18 of the install's 19 operator-written skill descriptions are longer than 60 characters, from 196 to 641. In the install's own `hermes prompt-size --platform cli` output, the index line of each of those 18 holds at most 65 bytes after the skill's name and its separator, so each is shown cut. The bytes run over 60 because some descriptions have accented letters and dashes.
 
 ## Analysis
 
@@ -136,4 +136,4 @@ The limit is a design choice: on v0.23.1 the comment above it says shipped skill
 
 ## Threats to validity
 
-Reproduced in CI on v2026.8.13, v2026.9.21, v2026.9.24, v0.21.6, v0.22.5, v0.22.6 and v0.23.1 on 2026-11-15 ([run 43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222); transcripts in [evidence/43665652222](../../evidence/43665652222/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro measures what the index shows, not what a model does with it. Skills registered by plugins are listed with their full description, which hermes-field-notes reports for 0.21.6 and later; that path is not covered here.
+Reproduced in CI on all seven pinned tags, v2026.8.13 to v0.23.1, on 2026-11-15 ([run 43668393761](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761); transcripts in [evidence/43668393761](../../evidence/43668393761/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro measures what the index shows, not what a model does with it. Skills registered by plugins are listed with their full description, which hermes-field-notes reports for 0.21.6 and later; that path is not covered here.

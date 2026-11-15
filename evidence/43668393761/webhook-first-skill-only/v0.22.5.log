@@ -1,0 +1,19 @@
+entry: webhook-first-skill-only
+tag: v0.22.5
+digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
+class: match
+token: alpha-only-beta-only
+expected: alpha-only-beta-only
+exit: 0
+duration_s: 12.491
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:37:04Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=alpha-only-beta-only
+
+--- stderr ---
+EVIDENCE POST status: both-listed 202, first-missing 202
+EVIDENCE ROUTE-BOTH: skill markers in the model request: ALPHA-7Q=1 BETA-7Q=0; lines: ALPHA-7Q is the marker of this skill.|
+EVIDENCE ROUTE-MISSING: skill markers in the model request: ALPHA-7Q=0 BETA-7Q=1; lines: BETA-7Q is the marker of this skill.|

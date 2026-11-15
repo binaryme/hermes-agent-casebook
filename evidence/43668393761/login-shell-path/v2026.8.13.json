@@ -1,0 +1,12 @@
+{
+  "slug": "login-shell-path",
+  "tag": "v2026.8.13",
+  "digest": "sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6",
+  "token": "venv-lost",
+  "expected": "venv-lost",
+  "class": "match",
+  "duration_s": 0.595,
+  "runner": "Linux-X64",
+  "timestamp_utc": "2026-11-15T02:36:41Z",
+  "run_url": "https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761"
+}

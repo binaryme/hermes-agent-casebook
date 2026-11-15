@@ -1,0 +1,19 @@
+entry: login-shell-path
+tag: v0.23.1
+digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+class: match
+token: venv-kept
+expected: venv-kept
+exit: 0
+duration_s: 1.548
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:36:07Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=venv-kept
+
+--- stderr ---
+EVIDENCE bash -c: python3 is /opt/hermes/.venv/bin/python3; bash -l -c: python3 is /opt/hermes/.venv/bin/python3
+EVIDENCE bash -l -c: python3 -c 'import openai', a dependency only the image venv has: importable
+EVIDENCE bash -l -c PATH: /opt/hermes/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

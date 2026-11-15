@@ -1,0 +1,20 @@
+entry: webhook-no-skills-index
+tag: v2026.9.21
+digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
+class: match
+token: empty-present-present
+expected: empty-present-present
+exit: 0
+duration_s: 28.985
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:38:04Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=empty-present-present
+
+--- stderr ---
+EVIDENCE default: prompt-size --platform webhook skills_index state, chars, skills listed, marker listed: empty 0 0 False
+EVIDENCE platform-skills: prompt-size --platform webhook skills_index state, chars, skills listed, marker listed: present 5374 53 True
+EVIDENCE route with-skills: POST status 202
+EVIDENCE route with-skills: 2 model requests recorded; casebook-marker lines:   casebook-marker:|    - casebook-marker: Marker skill that the repro looks for in the skills index.|

@@ -1,0 +1,12 @@
+{
+  "slug": "webhook-no-skills-index",
+  "tag": "v2026.9.24",
+  "digest": "sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7",
+  "token": "empty-present-present",
+  "expected": "empty-present-present",
+  "class": "match",
+  "duration_s": 34.17,
+  "runner": "Linux-X64",
+  "timestamp_utc": "2026-11-15T02:38:16Z",
+  "run_url": "https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761"
+}

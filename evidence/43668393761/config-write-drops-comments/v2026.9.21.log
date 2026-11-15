@@ -1,0 +1,20 @@
+entry: config-write-drops-comments
+tag: v2026.9.21
+digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
+class: match
+token: set-lost-boot-lost
+expected: set-lost-boot-lost
+exit: 0
+duration_s: 6.837
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:36:36Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=set-lost-boot-lost
+
+--- stderr ---
+EVIDENCE config.yaml before each write: # Operator notes, kept by hand.|agent:|  # Keep runs short on this host.|  max_turns: 30||
+EVIDENCE set: config.yaml after the write: 2 lines, 0 comment lines, no _config_version; first lines: agent:|  max_turns: 42|
+EVIDENCE boot: config.yaml after the write: 41 lines, 36 comment lines, _config_version: 45; first lines: agent:|  max_turns: 30|_config_version: 45||# ── Security ──────────────────────────────────────────────────────────|# Secret redaction is ON by default — strings that look like API keys,|# tokens, and passwords are masked in tool output, logs, and chat|# responses before the model or user ever sees them. Set redact_secrets|# to false to disable (e.g. when developing the redactor itself).|# tirith pre-exec scanning is enabled by default when the tirith binary|# is available. Configure via security.tirith_* keys or env vars|# (TIRITH_ENABLED, TIRITH_BIN, TIRITH_TIMEOUT, TIRITH_FAIL_OPEN).|
+EVIDENCE boot: config files left in the data directory: /opt/data/backups/config/config.yaml.good.20261115-023632 /opt/data/backups/config/config.yaml.good.20261115-023633 /opt/data/backups/config/config.yaml.pre-docker-migrate.20261115-023632 /opt/data/config.yaml

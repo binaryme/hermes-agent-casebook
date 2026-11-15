@@ -1,0 +1,12 @@
+{
+  "slug": "webhook-cross-route-dedup",
+  "tag": "v0.22.5",
+  "digest": "sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d",
+  "token": "both-accepted",
+  "expected": "both-accepted",
+  "class": "match",
+  "duration_s": 7.77,
+  "runner": "Linux-X64",
+  "timestamp_utc": "2026-11-15T02:36:51Z",
+  "run_url": "https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761"
+}

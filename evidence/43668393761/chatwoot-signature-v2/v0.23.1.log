@@ -1,0 +1,21 @@
+entry: chatwoot-signature-v2
+tag: v0.23.1
+digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+class: match
+token: 401-202-401-401
+expected: 401-202-401-401
+exit: 0
+duration_s: 12.359
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:35:56Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=401-202-401-401
+
+--- stderr ---
+EVIDENCE raw: status 401, body {"error": "Invalid signature"}
+EVIDENCE mapped: status 202, body {"status": "accepted", "route": "chatwoot", "event": "unknown", "delivery_id": "3b15041b-a796-460d-915d-cd47a5494444"}
+EVIDENCE tampered: status 401, body {"error": "Invalid signature"}
+EVIDENCE stale: status 401, body {"error": "Invalid signature"}
+EVIDENCE gateway log lines about signatures: 2026-11-15 02:35:55,327 WARNING gateway.platforms.webhook: [webhook] Invalid signature for route chatwoot|2026-11-15 02:35:55,762 WARNING gateway.platforms.webhook: [webhook] Invalid signature for route chatwoot|2026-11-15 02:35:55,859 WARNING gateway.platforms.webhook: [webhook] Invalid signature for route chatwoot|

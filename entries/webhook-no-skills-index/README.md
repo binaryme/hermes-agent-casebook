@@ -6,6 +6,11 @@ kind: gotcha
 status: unreported
 affected:
 - v2026.8.13
+- v2026.9.21
+- v2026.9.24
+- v0.21.6
+- v0.22.5
+- v0.22.6
 - v0.23.1
 not_affected: []
 fixed_in: null
@@ -29,12 +34,37 @@ verified_on:
   digest: sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
   date: '2026-11-15'
   observed: empty-present-present
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+- tag: v2026.9.21
+  digest: sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3
+  date: '2026-11-15'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+- tag: v2026.9.24
+  digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+  date: '2026-11-15'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+- tag: v0.21.6
+  digest: sha256:55e192fba0cd4fde61142abbff5adeacff40efdb482ccd0ff877924bd274f909
+  date: '2026-11-15'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+- tag: v0.22.5
+  digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
+  date: '2026-11-15'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+- tag: v0.22.6
+  digest: sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d
+  date: '2026-11-15'
+  observed: empty-present-present
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 - tag: v0.23.1
   digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
   date: '2026-11-15'
   observed: empty-present-present
-  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+  run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
 last_reviewed: '2026-11-14'
 limits: The repro checks whether the skills index is built, not whether a model would pick a skill from it. The workaround's effect on skill_manage was read in the source, not exercised.
 credits: []
@@ -46,7 +76,7 @@ You add a skill to the skills directory, and a webhook-triggered run behaves as 
 
 ## Hypothesis
 
-A webhook run's system prompt has no skills index unless the run's tools include `skills_list`, `skill_view` or `skill_manage`, and adding the `skills` toolset, for the platform or for one route, restores it. The hypothesis is falsified if a default webhook run lists the marker skill, or if either workaround leaves it out.
+A webhook run's system prompt has no skills index unless the run's tools include `skills_list`, `skill_view` or `skill_manage`, and adding the `skills` toolset, for the platform or for one route, restores it. The hypothesis is falsified if the default webhook prompt, as `hermes prompt-size --platform webhook` builds it, lists the marker skill, or if either workaround leaves it out of the prompt or of a real gateway run.
 
 ## Method
 
@@ -64,26 +94,31 @@ It prints `OBSERVED=<default>-<platform workaround>-<route workaround>`, each pa
 
 | Tag | Observed | Date | Digest | Run | Transcript |
 | --- | --- | --- | --- | --- | --- |
-| v2026.8.13 | `empty-present-present` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-no-skills-index/v2026.8.13.log) |
-| v0.23.1 | `empty-present-present` | 2026-11-15 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) | [log](../../evidence/43665652222/webhook-no-skills-index/v0.23.1.log) |
+| v2026.8.13 | `empty-present-present` | 2026-11-15 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/webhook-no-skills-index/v2026.8.13.log) |
+| v2026.9.21 | `empty-present-present` | 2026-11-15 | `sha256:6bece0644e29` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/webhook-no-skills-index/v2026.9.21.log) |
+| v2026.9.24 | `empty-present-present` | 2026-11-15 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/webhook-no-skills-index/v2026.9.24.log) |
+| v0.21.6 | `empty-present-present` | 2026-11-15 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/webhook-no-skills-index/v0.21.6.log) |
+| v0.22.5 | `empty-present-present` | 2026-11-15 | `sha256:9c5561579f3f` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/webhook-no-skills-index/v0.22.5.log) |
+| v0.22.6 | `empty-present-present` | 2026-11-15 | `sha256:d27689bc6e85` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/webhook-no-skills-index/v0.22.6.log) |
+| v0.23.1 | `empty-present-present` | 2026-11-15 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) | [log](../../evidence/43668393761/webhook-no-skills-index/v0.23.1.log) |
 
 ### Expected and observed
 
-| Case | What an operator expects | What the source does |
+| Case | What an operator expects | Observed |
 | --- | --- | --- |
 | Default webhook toolset | the index lists `casebook-marker` | `empty` |
 | `platform_toolsets.webhook` adds `skills` | listed | `present` |
 | Route `toolsets: [hermes-webhook, skills]` | listed | `present` |
 
-`expect.json` records `empty-present-present` on v2026.8.13 and v0.23.1.
+`expect.json` records `empty-present-present` on all seven pinned tags.
 
 ### Field observation
 
-On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 (UTC−6) with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands.
+On the author's own install (the official Docker image, v2026.8.13, in production since August 2026), read on 2026-11-14 with read-only commands. This is not reproducible by a reader and is not part of the CI evidence; it shows the behavior outside the harness. [Appendix E](../../evidence/field/2026-11-14.md) lists the commands. Statements marked *operator's account* come from the operator, not from a command.
 
 - `hermes prompt-size --platform cli` lists 95 skills in a 9,794-character index; `--platform webhook` on the same install gives a 0-character index.
 - Every webhook route that needs a skill names it under `skills:`; no route and no platform setting adds the `skills` toolset. That is the workaround without `skill_manage`.
-- Two skills on the install were written by the agent itself (`created_by: agent` in the usage file), from chat platforms that have the skill tools. A skill the agent writes is persistent and is offered to every platform afterwards, which is the risk the recommendation weighs.
+- Two skills on the install have `created_by: agent` in the usage file: the agent wrote them itself, on a platform that has the skill tools (operator's account). A skill the agent writes is persistent and is offered to every platform afterwards, which is the risk the recommendation weighs.
 
 ## Analysis
 
@@ -123,4 +158,4 @@ No upstream issue or pull request found on 2026-11-13. Searched for webhook toge
 
 ## Threats to validity
 
-Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-15 ([run 43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222); transcripts in [evidence/43665652222](../../evidence/43665652222/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.
+Reproduced in CI on all seven pinned tags, v2026.8.13 to v0.23.1, on 2026-11-15 ([run 43668393761](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761); transcripts in [evidence/43668393761](../../evidence/43668393761/README.md)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.

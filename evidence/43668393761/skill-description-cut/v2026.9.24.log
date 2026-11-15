@@ -1,0 +1,17 @@
+entry: skill-description-cut
+tag: v2026.9.24
+digest: sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+class: match
+token: hard-cut
+expected: hard-cut
+exit: 0
+duration_s: 38.568
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:37:15Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=hard-cut
+
+--- stderr ---
+EVIDENCE index_line_bytes: casebook-trims 82, casebook-short 62; the short description is 40 characters, so the long one is shown as 60

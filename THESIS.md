@@ -5,7 +5,7 @@ Seven reproducible behaviors of the webhook gateway, the skills index, the confi
 | | |
 | --- | --- |
 | Author | Israel Ortiz |
-| Version | 1.0.0, 2026-11-15 |
+| Version | 1.0.1, 2026-11-15 |
 | Subject | [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research, official Docker image, tags v2026.8.13 to v0.23.1 |
 | Licenses | Prose CC-BY-4.0 ([LICENSE](LICENSE)); code MIT ([LICENSE-CODE](LICENSE-CODE)) |
 | How to cite | [CITATION.cff](CITATION.cff) |
@@ -14,15 +14,15 @@ Independent work. Not affiliated with, endorsed by, or reviewed by Nous Research
 
 ## Abstract
 
-Hermes Agent is an open-source agent runtime that operators run as a long-lived gateway, often triggered by webhooks from other systems. Several of its behaviors differ from what its documentation leads an operator to expect, and they fail silently: a skill that is never offered, a second skill that is never loaded, a signed delivery that is refused, a config file that loses its comments. This work isolates seven such behaviors, states each as a falsifiable hypothesis, and tests it with a short script against official Hermes images pinned by registry digest, with a local stub in place of the language model. Every script ran in public CI on every tag its entry names; all 23 entry and tag pairs matched the hypothesis, and the transcripts of that run are committed with the text. Three behaviors are present on every tested tag, including the newest (v0.23.1); four were fixed upstream at a tag this work identifies. For each, the cause is traced to pinned source lines and a workaround is given with its cost. Six of the seven were also observed on the author's production install. The main recommendation is that a webhook route should be treated as its own platform: it has no skills index, loads one forced skill, and on older tags shares one deduplication map with every other route.
+Hermes Agent is an open-source agent runtime that operators run as a long-lived gateway, often triggered by webhooks from other systems. Several of its behaviors differ from what its documentation leads an operator to expect, and they fail silently: a skill that is never offered, a second skill that is never loaded, a signed delivery that is refused, a config file that loses its comments. This work isolates seven such behaviors, states each as a falsifiable hypothesis, and tests it with a short script against official Hermes images pinned by registry digest, with a local stub in place of the language model. Every script ran in public CI on all seven pinned tags, from v2026.8.13 to v0.23.1; all 49 entry and tag pairs matched the hypothesis, and the transcripts of that run are committed with the text. Three behaviors are present on all seven tags, including the newest. Three were fixed upstream, and for each the first pinned tag without it is identified. For the fourth, the 60-character limit on skill descriptions, only the style of the cut changed. For each behavior, the cause is traced to pinned source lines and a workaround is given with its cost. Six of the seven were also seen, with read-only commands, on the author's production install. The main recommendation is that a webhook route should be treated as its own platform: it has no skills index, loads one forced skill, and on older tags shares one deduplication map with every other route.
 
 ## Declaration
 
 I set the scope and the rules of this work, operated the Hermes install it draws on, and chose what to publish.
 
-Most of this repository was written by an AI coding agent (Claude, through Claude Code). It read the upstream source and documentation, wrote the harness, the repro scripts, the Chatwoot relay and the text, ran every repro locally, dispatched every CI run, and, with my permission, ran the read-only field observations on my install. A second, independent AI review checked the claims against their cited sources before release, and its findings were fixed.
+Most of this repository was written by an AI coding agent (Claude, through Claude Code). It read the upstream source and documentation, wrote the harness, the repro scripts, the Chatwoot relay and the text, ran every repro locally, dispatched every CI run, and, with my permission, ran the read-only field observations on my install. Two separate AI review sessions, which did not write the text, checked the claims against their cited sources and the run transcripts, one before release and one after; their findings were addressed, and what changed is in the [changelog](CHANGELOG.md).
 
-I reviewed entry E1 against my own experience operating Hermes. The field observations compare every other entry with my install, but I have not reviewed each of those entries line by line, and I did not review the harness code line by line. The confidence of every entry comes from the CI run linked in it, not from my review.
+I reviewed entry E1 against my own experience operating Hermes. The field observations compare every entry except E3 with my install, but I have not reviewed each of the other entries line by line, and I did not review the harness code line by line. The confidence of every entry comes from the CI run linked in it, not from my review.
 
 Commits carry no AI trailers, by my choice. This declaration is the disclosure.
 
@@ -122,7 +122,7 @@ GitHub keeps this repository's artifacts and logs for 90 days at most. So `stamp
 
 ### 3.8 Field observations
 
-Each entry was also compared with the author's production install of v2026.8.13, with read-only commands. These are reported separately in each entry under Field observation, record counts and versions only, and are not evidence a reader can rerun ([Appendix E](#appendices)).
+Every entry except E3 was also compared with the author's production install of v2026.8.13, with read-only commands. These are reported separately in each entry under Field observation, record counts and versions only, and are not evidence a reader can rerun ([Appendix E](#appendices)).
 
 ### 3.9 Source reading
 
@@ -134,17 +134,17 @@ Every week, [watch-upstream.yml](.github/workflows/watch-upstream.yml) runs ever
 
 ## 4. Results
 
-All seven hypotheses held on every tag tested. CI run [43665652222](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222) matched all 23 entry and tag pairs; its results and transcripts are in [evidence/43665652222](evidence/43665652222/README.md).
+Every entry ran on all seven pinned tags, and all seven hypotheses held on every one. CI run [43668393761](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761) matched all 49 entry and tag pairs; its results and transcripts are in [evidence/43668393761](evidence/43668393761/README.md). "Absent from" means the first pinned tag without the behavior and every pinned tag after it; releases between pinned tags were not tested.
 
 | Entry | Behavior | Present on | Absent from | Token where present |
 | --- | --- | --- | --- | --- |
-| [E1](entries/webhook-no-skills-index/README.md) | Webhook runs have no skills index | v2026.8.13, v0.23.1 | none tested | `empty-present-present` |
-| [E2](entries/webhook-first-skill-only/README.md) | A route's `skills:` loads only the first resolvable skill | v2026.8.13, v0.23.1 | none tested | `alpha-only-beta-only` |
-| [E3](entries/chatwoot-signature-v2/README.md) | Chatwoot's signature is refused unless its headers are mapped | v2026.8.13, v0.23.1 | none tested | `401-202-401-401` |
-| [E4](entries/skill-description-cut/README.md) | The index cuts descriptions at 60 characters | v2026.8.13 to v0.22.5 (hard cut) | v0.22.6, v0.23.1 cut at a word | `hard-cut` |
-| [E6](entries/config-write-drops-comments/README.md) | `config set` and the boot migration drop comments | v2026.8.13, v2026.9.21 | v2026.9.24 | `set-lost-boot-lost` |
-| [E7](entries/login-shell-path/README.md) | The login shell loses the image's Python | v2026.8.13, v0.22.5 | v0.22.6, v0.23.1 | `venv-lost` |
-| [E9](entries/webhook-cross-route-dedup/README.md) | One delivery id runs on only one of two routes | v2026.8.13, v2026.9.24 | v0.21.6 | `duplicate` |
+| [E1](entries/webhook-no-skills-index/README.md) | Webhook runs have no skills index | all seven | none | `empty-present-present` |
+| [E2](entries/webhook-first-skill-only/README.md) | A route's `skills:` loads only the first resolvable skill | all seven | none | `alpha-only-beta-only` |
+| [E3](entries/chatwoot-signature-v2/README.md) | Chatwoot's signature is refused unless its headers are mapped | all seven | none | `401-202-401-401` |
+| [E4](entries/skill-description-cut/README.md) | The index cuts descriptions at 60 characters, mid-word | v2026.8.13 to v0.22.5 | v0.22.6, v0.23.1, which still cut at 60, at a word | `hard-cut` |
+| [E6](entries/config-write-drops-comments/README.md) | `config set` and the boot migration drop comments | v2026.8.13, v2026.9.21 | v2026.9.24 to v0.23.1 | `set-lost-boot-lost` |
+| [E7](entries/login-shell-path/README.md) | The login shell loses the image's Python | v2026.8.13 to v0.22.5 | v0.22.6, v0.23.1 | `venv-lost` |
+| [E9](entries/webhook-cross-route-dedup/README.md) | One delivery id runs on only one of two routes | v2026.8.13 to v2026.9.24 | v0.21.6 to v0.23.1 | `duplicate` |
 
 Each section below states the result. The entry it links to is the full section: observation, hypothesis, method, runs, analysis, recommendation, related work and threats to validity.
 
@@ -170,7 +170,7 @@ Before v2026.9.24, both `hermes config set` and the boot-time schema migration r
 
 ### 4.6 E7: the login shell loses the image's Python
 
-Before v0.22.6, `/etc/profile` resets `PATH` in the login shell the terminal tool uses, so `python3` is the system interpreter without Hermes' modules. v0.22.6 restores the path in `/etc/profile.d`. [Entry](entries/login-shell-path/README.md).
+Before v0.22.6, `/etc/profile` resets `PATH` in the login shell the terminal tool uses, so `python3` is an interpreter outside the image's virtualenv, which cannot import Hermes' dependencies. v0.22.6 restores the path in `/etc/profile.d`. [Entry](entries/login-shell-path/README.md).
 
 ### 4.7 E9: routes share one deduplication map
 
@@ -192,11 +192,11 @@ E6 shows a class rather than one bug: any component that parses and re-dumps a f
 
 ### 5.3 Silent failures
 
-None of the seven behaviors produces an error an operator would notice. E3 logs a warning that reads like a wrong secret; E2 logs nothing when a later skill is dropped; E1, E4, E6 and E7 log nothing at all. This is why they cost time, and why each entry gives the one observable check (a `prompt-size` count, a status code, a grep) that tells an operator which case they are in.
+None of the seven behaviors produces an error an operator would notice. E3 logs a warning that reads like a wrong secret, which the E3 transcripts show. For the others the source has no log line for the case: E2 logs only names that do not resolve, not the skills it drops after the first, and E1, E4, E6 and E7 have no log line at all on the path the repros take. That part is source reading; the repros other than E3 do not check the logs. This is why they cost time, and why each entry gives the one observable check (a `prompt-size` count, a status code, a grep) that tells an operator which case they are in.
 
 ### 5.4 What to change first
 
-On any tag: give each webhook route exactly one forced skill, or merge the skills it needs (E2); weigh `skill_manage` before adding the `skills` toolset to a route that renders outside text (E1); put trigger words in the first 55 characters of every description (E4); map Chatwoot's headers or use the relay (E3). On older tags, upgrading removes E4's hard cut, E6, E7 and E9; v0.22.6 or later covers all four.
+On any tag: give each webhook route exactly one forced skill, or merge the skills it needs (E2); weigh `skill_manage` before adding the `skills` toolset to a route that renders outside text (E1); keep every description within 60 characters, with its trigger words at the very start, because the word-boundary cut can keep fewer (E4); map Chatwoot's headers or use the relay (E3). On older tags, upgrading removes E4's hard cut, E6, E7 and E9; v0.22.6 or later covers all four.
 
 ## 6. Threats to validity
 
@@ -206,19 +206,19 @@ The classification follows the usual split for empirical software engineering [W
 
 **Internal validity.** A harness bug could pass for a behavior. Failures are classed `repro-error` and never stamped; most repros test contrasting cases in one run, such as E3's four requests or E1's three configurations, or run on tags where the behavior differs, so a harness that always printed the same answer would not match; and the gateway is the real one from the pinned image, not a reimplementation.
 
-**External validity.** Only the official Docker image was tested, at seven tags, with minimal configurations. Other install methods, other configurations, and tags between the pinned ones may behave differently. A repro shows that a behavior is present on the listed tags; it does not show its absence anywhere else. The field observations come from one install.
+**External validity.** Only the official Docker image was tested, at seven tags, with minimal configurations. Other install methods, other configurations, and releases between the pinned tags may behave differently, so a "fixed in" tag is the first fixed among the pinned tags, not necessarily the release that fixed it. A repro shows that a behavior is present on the listed tags; it does not show its absence anywhere else. The field observations come from one install.
 
 **Reliability.** Images are pinned by digest, runs are public, and their evidence is committed with checksums, so a rerun on the same digests should give the same tokens. Line references are pinned to commits and drift on `main`.
 
-**Authorship.** Most of this work was written by an AI agent ([Declaration](#declaration)). A second AI review checked the claims against their sources, and every claim of observation is backed by a CI transcript, but a reader should weigh the causes, which are source reading, accordingly. Corrections are taken through [issues](https://github.com/binaryme/hermes-agent-casebook/issues/new/choose) and recorded in the [changelog](CHANGELOG.md).
+**Authorship.** Most of this work was written by an AI agent ([Declaration](#declaration)). Separate AI review sessions checked the claims against their sources. Every claim of observation in an entry's Results is backed by a CI transcript; the field observations are not, and are labelled. A reader should weigh the causes, which are source reading, accordingly. Corrections are taken through [issues](https://github.com/binaryme/hermes-agent-casebook/issues/new/choose) and recorded in the [changelog](CHANGELOG.md).
 
 ## 7. Conclusion and future work
 
 **RQ1.** Seven behaviors contradict a reasonable reading of the documentation: four in the webhook gateway (E1, E2, E3, E9), one in the skills index (E4), one in the config writers (E6) and one in the terminal environment (E7).
 
-**RQ2.** E1, E2 and E3 are present on every tested tag, including v0.23.1. E9 changed at v0.21.6, E6 at v2026.9.24, E7 at v0.22.6, and E4 moved from a hard cut to a word-boundary cut at v0.22.6.
+**RQ2.** E1, E2 and E3 are present on all seven pinned tags, including v0.23.1. Among the pinned tags, E9 is first absent at v0.21.6, E6 at v2026.9.24 and E7 at v0.22.6, and E4 moved from a hard cut to a word-boundary cut at v0.22.6.
 
-**RQ3.** Every entry gives a workaround that held on its affected tags, and states its cost: the `skills` toolset for E1 brings `skill_manage`; one skill per route for E2 means merging skills; a relay for E3 is one more process; for E6, E7 and E9, upgrading is the fix and the alternatives each need care.
+**RQ3.** Every entry gives a workaround and states its cost. The repros exercise two of them, E1's `skills` toolset and E3's header mapping, and the field observations show E7's `uv pip install --target` working on one install; the others follow from the source and are not run. The costs: the `skills` toolset for E1 brings `skill_manage`; one skill per route for E2 means merging skills; a relay for E3 is one more process; for E6, E7 and E9, upgrading is the fix and the alternatives each need care.
 
 Future work: report E1 and E3 upstream and follow E2's pull request; extend the pinned tags as upstream releases; test the pip install; and add entries for the deferred candidates, E5 among them. The weekly watch will show when a fix lands.
 

@@ -1,0 +1,17 @@
+entry: webhook-cross-route-dedup
+tag: v0.22.5
+digest: sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d
+class: match
+token: both-accepted
+expected: both-accepted
+exit: 0
+duration_s: 7.77
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:36:51Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=both-accepted
+
+--- stderr ---
+EVIDENCE same X-GitHub-Delivery to two routes: notify status 202, review status 202, review body {"status": "accepted", "route": "review", "event": "push", "delivery_id": "casebook-1794710211-4190"}

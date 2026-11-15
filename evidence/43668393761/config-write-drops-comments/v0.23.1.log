@@ -1,0 +1,20 @@
+entry: config-write-drops-comments
+tag: v0.23.1
+digest: sha256:276d44685c65c0cb2a25f190b63c65c8906f9dc76486fb1c05ae71b5826bda08
+class: match
+token: set-kept-boot-kept
+expected: set-kept-boot-kept
+exit: 0
+duration_s: 9.316
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:36:05Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=set-kept-boot-kept
+
+--- stderr ---
+EVIDENCE config.yaml before each write: # Operator notes, kept by hand.|agent:|  # Keep runs short on this host.|  max_turns: 30||
+EVIDENCE set: config.yaml after the write: 5 lines, 2 comment lines, no _config_version; first lines: # Operator notes, kept by hand.|agent:|  # Keep runs short on this host.|  max_turns: 42||
+EVIDENCE boot: config.yaml after the write: 5 lines, 2 comment lines, _config_version: 53; first lines: # Operator notes, kept by hand.|agent:|  # Keep runs short on this host.|  max_turns: 30|_config_version: 53|
+EVIDENCE boot: config files left in the data directory: /opt/data/backups/config/config.yaml.good.20261115-023600 /opt/data/backups/config/config.yaml.good.20261115-023602 /opt/data/backups/config/config.yaml.pre-docker-migrate.20261115-023559 /opt/data/config.yaml

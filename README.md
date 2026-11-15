@@ -4,16 +4,16 @@ Reproducible operator notes for [Hermes Agent](https://github.com/NousResearch/h
 
 Independent work. Not affiliated with, endorsed by, or reviewed by Nous Research. "Hermes Agent" refers to github.com/NousResearch/hermes-agent (MIT).
 
-**Read the thesis: [THESIS.md](THESIS.md)**, *Where Hermes Agent surprises its operators*, by Israel Ortiz, version 1.0.0. It has the abstract, the declaration of how it was made, the method, the discussion and the threats to validity. The entries below are the sections of its results chapter.
+**Read the thesis: [THESIS.md](THESIS.md)**, *Where Hermes Agent surprises its operators*, by Israel Ortiz, version 1.0.1. It has the abstract, the declaration of how it was made, the method, the discussion and the threats to validity. The entries below are the sections of its results chapter.
 
 ## The entries
 
 | Id | Read this if you | Present on |
 | --- | --- | --- |
-| [E1](entries/webhook-no-skills-index/README.md) | added a skill and webhook runs never use it | every tested tag |
-| [E2](entries/webhook-first-skill-only/README.md) | list more than one skill on a webhook route | every tested tag |
-| [E3](entries/chatwoot-signature-v2/README.md) | point Chatwoot at Hermes and get 401 on every delivery | every tested tag |
-| [E4](entries/skill-description-cut/README.md) | write long skill descriptions | every tested tag; word-boundary cut from v0.22.6 |
+| [E1](entries/webhook-no-skills-index/README.md) | added a skill and webhook runs never use it | all seven pinned tags |
+| [E2](entries/webhook-first-skill-only/README.md) | list more than one skill on a webhook route | all seven pinned tags |
+| [E3](entries/chatwoot-signature-v2/README.md) | point Chatwoot at Hermes and get 401 on every delivery | all seven pinned tags |
+| [E4](entries/skill-description-cut/README.md) | write long skill descriptions | all seven pinned tags; cut at a word from v0.22.6 |
 | [E6](entries/config-write-drops-comments/README.md) | keep comments in `config.yaml` | before v2026.9.24 |
 | [E7](entries/login-shell-path/README.md) | see `ModuleNotFoundError` from the terminal tool | before v0.22.6 |
 | [E9](entries/webhook-cross-route-dedup/README.md) | point two webhook routes at one GitHub event | before v0.21.6 |

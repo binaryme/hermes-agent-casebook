@@ -1,0 +1,19 @@
+entry: login-shell-path
+tag: v0.21.6
+digest: sha256:55e192fba0cd4fde61142abbff5adeacff40efdb482ccd0ff877924bd274f909
+class: match
+token: venv-lost
+expected: venv-lost
+exit: 0
+duration_s: 0.608
+runner: Linux-X64
+timestamp_utc: 2026-11-15T02:36:47Z
+run_url: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43668393761
+
+--- stdout ---
+OBSERVED=venv-lost
+
+--- stderr ---
+EVIDENCE bash -c: python3 is /opt/hermes/.venv/bin/python3; bash -l -c: python3 is /usr/local/bin/python3
+EVIDENCE bash -l -c: python3 -c 'import openai', a dependency only the image venv has: ModuleNotFoundError
+EVIDENCE bash -l -c PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
