@@ -1,5 +1,9 @@
 {
   "v2026.8.13": "set-lost-boot-lost",
   "v2026.9.21": "set-lost-boot-lost",
-  "v2026.9.24": "set-kept-boot-kept"
+  "v2026.9.24": "set-kept-boot-kept",
+  "v0.21.6": "set-kept-boot-kept",
+  "v0.22.5": "set-kept-boot-kept",
+  "v0.22.6": "set-kept-boot-kept",
+  "v0.23.1": "set-kept-boot-kept"
 }
