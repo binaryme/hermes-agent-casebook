@@ -37,14 +37,14 @@ Every entry lives in `entries/<slug>/` and has four parts:
 
 The body has exactly these second-level headings, in this order:
 
-1. Symptom
-2. Verified on
-3. Reproduce
-4. Expected vs actual
-5. Cause
-6. Workaround
-7. Upstream status
-8. Confidence and limits
+1. Observation: what an operator sees, in their terms.
+2. Hypothesis: the claim the repro tests, and what result would falsify it.
+3. Method: what `repro.sh` does, case by case, and the token it prints.
+4. Results: a `### Runs` subsection, which `harness/stamp.py` writes and nobody edits by hand, then `### Expected and observed`. A `### Field observation` subsection may follow, for what was seen on the author's own install; it is labelled as such and holds counts and versions only.
+5. Analysis: the cause, as source reading, with pinned links.
+6. Recommendation: what to do, on which tags, and at what cost.
+7. Related work: upstream issues and pull requests, and when they were searched.
+8. Threats to validity: what the run shows and what it does not.
 
 ## Repro contract
 
@@ -70,7 +70,7 @@ A `repro-error` is never read as a behavior.
 
 Next to each result, `run_repro.py` writes `<entry>/<tag>.log`: the result fields, then the repro's stdout and stderr, each capped at 64 KiB, with the temporary work directory shown as `$WORK` and the home directory as `~`. CI uploads both files as the run's artifacts.
 
-GitHub keeps artifacts for 90 days, so a run link alone does not last. `harness/stamp.py --run <id>` copies every result and transcript of that run into `evidence/<id>/`, with a `README.md` naming the run, its commit and its trigger, and a `SHA256SUMS` file. Each entry's results table links to its transcripts there. Only CI runs are copied; a local run is never evidence.
+GitHub keeps artifacts for 90 days, so a run link alone does not last. `harness/stamp.py --run <id>` copies every result and transcript of that run into `evidence/<id>/`, with a `README.md` naming the run, its commit and its trigger, and a `SHA256SUMS` file. Each entry's `### Runs` table links to its transcripts there. Only CI runs are copied; a local run is never evidence.
 
 ## Enforced rules
 

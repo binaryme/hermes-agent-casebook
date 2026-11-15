@@ -21,34 +21,40 @@ last_reviewed: 2026-11-13
 credits: []
 ---
 
-## Symptom
+## Observation
 
 The example feature does nothing until its toolset is enabled.
 
-## Verified on
+## Hypothesis
 
-Nothing yet.
+The example feature needs its toolset.
 
-## Reproduce
+## Method
 
 Run `entries/bad-missing-field/repro.sh` through the harness.
 
-## Expected vs actual
+## Results
+
+### Runs
+
+Nothing yet.
+
+### Expected and observed
 
 Expected `present`, actual `empty`.
 
-## Cause
+## Analysis
 
 The toolset gate in the example source.
 
-## Workaround
+## Recommendation
 
 Enable the toolset.
 
-## Upstream status
+## Related work
 
 One open issue.
 
-## Confidence and limits
+## Threats to validity
 
 Source reading only.

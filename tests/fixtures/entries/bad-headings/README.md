@@ -22,34 +22,40 @@ limits: Source reading only. Not run on any image yet.
 credits: []
 ---
 
-## Symptom
+## Observation
+
+Hypothesis below.
+
+## Hypothesis
 
 The example feature does nothing until its toolset is enabled.
 
-## Verified on
+## Results
+
+### Runs
 
 Nothing yet.
 
-## Reproduce
+## Method
 
 Run `entries/bad-headings/repro.sh` through the harness.
 
-## Expected vs actual
+### Expected and observed
 
 Expected `present`, actual `empty`.
 
-## Workaround
+## Recommendation
 
 Enable the toolset.
 
-## Cause
+## Analysis
 
 The toolset gate in the example source.
 
-## Upstream status
+## Related work
 
 One open issue.
 
-## Confidence and limits
+## Threats to validity
 
 Source reading only.

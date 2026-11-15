@@ -40,18 +40,15 @@ limits: The repro checks whether the skills index is built, not whether a model 
 credits: []
 ---
 
-## Symptom
+## Observation
 
 You add a skill to the skills directory, and a webhook-triggered run behaves as if it does not exist. The same skill shows up in a CLI session. Nothing in the logs says the index was skipped.
 
-## Verified on
+## Hypothesis
 
-| Tag | Observed | Date | Digest | Run |
-| --- | --- | --- | --- | --- |
-| v2026.8.13 | `empty-present-present` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
-| v0.23.1 | `empty-present-present` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+A webhook run's system prompt has no skills index unless the run's tools include `skills_list`, `skill_view` or `skill_manage`, and adding the `skills` toolset, for the platform or for one route, restores it. The hypothesis is falsified if a default webhook run lists the marker skill, or if either workaround leaves it out.
 
-## Reproduce
+## Method
 
 `repro.sh` puts one marker skill, `casebook-marker`, in the data directory and checks three cases:
 
@@ -61,7 +58,16 @@ You add a skill to the skills directory, and a webhook-triggered run behaves as 
 
 It prints `OBSERVED=<default>-<platform workaround>-<route workaround>`, each part `empty` or `present`.
 
-## Expected vs actual
+## Results
+
+### Runs
+
+| Tag | Observed | Date | Digest | Run |
+| --- | --- | --- | --- | --- |
+| v2026.8.13 | `empty-present-present` | 2026-11-14 | `sha256:68e15ae2a6d8` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+| v0.23.1 | `empty-present-present` | 2026-11-14 | `sha256:276d44685c65` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
+
+### Expected and observed
 
 | Case | What an operator expects | What the source does |
 | --- | --- | --- |
@@ -71,13 +77,13 @@ It prints `OBSERVED=<default>-<platform workaround>-<route workaround>`, each pa
 
 `expect.json` records `empty-present-present` on v2026.8.13 and v0.23.1.
 
-## Cause
+## Analysis
 
 The system prompt builds the skills index only when one of `skills_list`, `skill_view` or `skill_manage` is among the run's tools, and returns an empty string otherwise ([v0.23.1 system_prompt.py L307-L311](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/agent/system_prompt.py#L307-L311); the same check at [v2026.8.13 L412-L413](https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/agent/system_prompt.py#L412-L413)).
 
 The default webhook toolset, `hermes-webhook`, is `web_search`, `web_extract`, `vision_analyze` and `clarify` ([v0.23.1 toolsets.py L39](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L39) and [L221](https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L221)). None of the three skill tools is in it, so a webhook run never gets an index. Skills a route lists under `skills:` are still injected into the message. That path does not depend on the index.
 
-## Workaround
+## Recommendation
 
 Add the `skills` toolset, either for every webhook route:
 
@@ -103,10 +109,10 @@ Weigh this before you do it. The `skills` toolset is `skills_list`, `skill_view`
 
 If the route only ever needs a fixed set of skills, list them under the route's `skills:` instead and leave the toolset alone. That avoids `skill_manage`. Read [E2](../webhook-first-skill-only/README.md) first: only the first resolvable name in that list is injected.
 
-## Upstream status
+## Related work
 
 No upstream issue or pull request found on 2026-11-13. Searched for webhook together with `skills_list`, `skill_view`, "skills index", "skills toolset" and `platform_toolsets`.
 
-## Confidence and limits
+## Threats to validity
 
 Reproduced in CI on v2026.8.13 and v0.23.1 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The repro shows that the index is built or not. It does not show which skill a model would choose from it, and it does not exercise `skill_manage`.

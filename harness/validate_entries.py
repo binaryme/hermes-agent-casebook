@@ -37,15 +37,16 @@ ENUM_FIELDS = {
     "confidence": ("reproduced", "source-verified"),
 }
 EXPECTED_HEADINGS = (
-    "Symptom",
-    "Verified on",
-    "Reproduce",
-    "Expected vs actual",
-    "Cause",
-    "Workaround",
-    "Upstream status",
-    "Confidence and limits",
+    "Observation",
+    "Hypothesis",
+    "Method",
+    "Results",
+    "Analysis",
+    "Recommendation",
+    "Related work",
+    "Threats to validity",
 )
+RUNS_HEADING = "### Runs"
 NONE_FOUND = "none-found"
 SHEBANG = "#!/usr/bin/env bash"
 SCANNED_SUFFIXES = (".sh", ".py", ".yml", ".yaml", ".toml")
@@ -187,6 +188,11 @@ def split_front_matter(text):
         if lines[index].rstrip() == "---":
             return "\n".join(lines[1:index]), "\n".join(lines[index + 1 :])
     return None, text
+
+
+def results_section(body):
+    match = re.search(r"^## Results[ \t]*\n(.*?)(?=^## |\Z)", body, re.MULTILINE | re.DOTALL)
+    return match.group(1) if match else ""
 
 
 def body_headings(body):
@@ -467,6 +473,8 @@ class EntryChecker:
     def check_headings(self, body):
         found = body_headings(body)
         expected = list(EXPECTED_HEADINGS)
+        if RUNS_HEADING not in results_section(body).splitlines():
+            self.fail("headings", f"the Results section needs a '{RUNS_HEADING}' subsection")
         if found == expected:
             return
         problems = [f"missing heading '## {heading}'" for heading in expected if heading not in found]

@@ -171,17 +171,24 @@ class EntryRuleTests(unittest.TestCase):
     def test_extra_and_missing_headings_are_both_named(self):
         clone = clone_good_entry(self.entries, "headed")
         readme = clone / "README.md"
-        text = readme.read_text(encoding="utf-8").replace("## Cause", "## Reason")
+        text = readme.read_text(encoding="utf-8").replace("## Analysis", "## Reason")
         readme.write_text(text, encoding="utf-8")
         messages = " ".join(finding.message for finding in self.validate().violations)
-        self.assertIn("missing heading '## Cause'", messages)
+        self.assertIn("missing heading '## Analysis'", messages)
         self.assertIn("unexpected heading '## Reason'", messages)
 
     def test_duplicate_heading_is_rejected(self):
         clone = clone_good_entry(self.entries, "dupe-heading")
         readme = clone / "README.md"
-        readme.write_text(readme.read_text(encoding="utf-8") + "\n## Symptom\n\nAgain.\n", encoding="utf-8")
+        readme.write_text(readme.read_text(encoding="utf-8") + "\n## Observation\n\nAgain.\n", encoding="utf-8")
         self.assertEqual({"headings"}, rules_of(self.validate()))
+
+    def test_results_need_a_runs_subsection(self):
+        clone = clone_good_entry(self.entries, "no-runs")
+        readme = clone / "README.md"
+        readme.write_text(readme.read_text(encoding="utf-8").replace("### Runs", "### Table"), encoding="utf-8")
+        messages = " ".join(finding.message for finding in self.validate().violations)
+        self.assertIn("needs a '### Runs' subsection", messages)
 
     def test_literal_tag_shapes_are_rejected_even_when_unpinned(self):
         clone = clone_good_entry(self.entries, "tagged")

@@ -48,11 +48,21 @@ credits:
 - kshitijk4poor, who landed it in pull request 130692
 ---
 
-## Symptom
+## Observation
 
 You add two GitHub webhooks for the same event, each to its own Hermes route, for example one that posts a notice and one that reviews pull requests. Each event runs on only one of them, and over time the split between the two can look uneven. The one that loses answers `200 {"status": "duplicate"}`, so GitHub shows the delivery as successful, and the gateway logs only `Skipping duplicate delivery`.
 
-## Verified on
+## Hypothesis
+
+On affected tags the webhook gateway deduplicates deliveries by delivery id alone, across routes, so the same GitHub delivery sent to two routes runs only once; from v0.21.6 each route accepts it. The hypothesis is falsified if both routes accept the delivery on an affected tag, or if the second is refused on v0.21.6.
+
+## Method
+
+`repro.sh` boots a gateway with two routes, `notify` and `review`, both accepting `push` with the same secret. It posts one GitHub-signed payload to `notify` and then the same payload with the same `X-GitHub-Delivery` id to `review`, the way GitHub does when two hooks fire on one event. It prints `duplicate` when the second route answers 200 with `"duplicate"`, `both-accepted` when it answers 202, and `second-<status>` otherwise. A first route that does not answer 202 is a repro error.
+
+## Results
+
+### Runs
 
 | Tag | Observed | Date | Digest | Run |
 | --- | --- | --- | --- | --- |
@@ -60,18 +70,14 @@ You add two GitHub webhooks for the same event, each to its own Hermes route, fo
 | v2026.9.24 | `duplicate` | 2026-11-14 | `sha256:fca358f12efd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
 | v0.21.6 | `both-accepted` | 2026-11-14 | `sha256:55e192fba0cd` | [run](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802) |
 
-## Reproduce
-
-`repro.sh` boots a gateway with two routes, `notify` and `review`, both accepting `push` with the same secret. It posts one GitHub-signed payload to `notify` and then the same payload with the same `X-GitHub-Delivery` id to `review`, the way GitHub does when two hooks fire on one event. It prints `duplicate` when the second route answers 200 with `"duplicate"`, `both-accepted` when it answers 202, and `second-<status>` otherwise. A first route that does not answer 202 is a repro error.
-
-## Expected vs actual
+### Expected and observed
 
 | Tag | `review` answers | Token |
 | --- | --- | --- |
 | v2026.8.13, v2026.9.24 | `200 {"status": "duplicate"}` | `duplicate` |
 | v0.21.6 | `202 accepted` | `both-accepted` |
 
-## Cause
+## Analysis
 
 Up to v2026.9.24 the gateway remembers deliveries in one map keyed by the delivery id alone ([v2026.9.24 webhook.py L316-L325](https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/gateway/platforms/webhook.py#L316-L325); the same at [v2026.8.13 L451-L460](https://github.com/NousResearch/hermes-agent/blob/f80f453ae0679347e38abc917c7f94f717bf96c5/gateway/platforms/webhook.py#L451-L460)), and a second request with a known id gets `200 {"status": "duplicate"}` ([L620-L623](https://github.com/NousResearch/hermes-agent/blob/f97608f178d1ffeca59860195ab7da295f7c8e5f/gateway/platforms/webhook.py#L620-L623)). GitHub sends the same `X-GitHub-Delivery` to every hook subscribed to the event, so one route runs and the other is dropped, every time.
 
@@ -81,16 +87,16 @@ v0.21.6 keys the map on a `_WebhookDeliveryIdentity` of profile, route and deliv
 
 Upstream switched tag schemes between these releases: v0.21.6 was published on 2026-10-08, after v2026.9.24 (2026-09-24). "v0.21.6 or later" includes every v0.22 and v0.23 release.
 
-## Workaround
+## Recommendation
 
 - Upgrade to v0.21.6 or later.
 - On an older image, use one GitHub hook and one route per event, and let that one route do both jobs.
 - Or give the second hook a different event filter, so the two routes never share a delivery.
 
-## Upstream status
+## Related work
 
 Fixed. Issue [#7448](https://github.com/NousResearch/hermes-agent/issues/7448), "Webhook idempotency is keyed only by delivery ID, so the second route is skipped in valid multi-route fan-out", was opened on 2026-04-10. Pull request [#130692](https://github.com/NousResearch/hermes-agent/pull/130692) fixed it, salvaging [#129626](https://github.com/NousResearch/hermes-agent/pull/129626), and was merged on 2026-10-01; the fix ships in v0.21.6.
 
-## Confidence and limits
+## Threats to validity
 
 Reproduced in CI on v2026.8.13, v2026.9.24 and v0.21.6 on 2026-11-14 ([run 43544045802](https://github.com/binaryme/hermes-agent-casebook/actions/runs/43544045802)), each against the digest pinned in `harness/images.json`. The causes are source-verified at the linked lines. The deliveries come from the repro, not from GitHub, and routes with a `script` are not covered.

@@ -38,35 +38,41 @@ limits: Read in the source only.
 credits: []
 ---
 
-## Symptom
+## Observation
 
 Something.
 
-## Verified on
+## Hypothesis
 
-No CI run has been recorded yet.
+Something is expected.
 
-## Reproduce
+## Method
 
 Run it.
 
-## Expected vs actual
+## Results
+
+### Runs
+
+No CI run has been recorded yet.
+
+### Expected and observed
 
 Expected.
 
-## Cause
+## Analysis
 
 Cause.
 
-## Workaround
+## Recommendation
 
 Workaround.
 
-## Upstream status
+## Related work
 
 None.
 
-## Confidence and limits
+## Threats to validity
 
 Limits.
 """
@@ -171,12 +177,13 @@ class StampEntryTests(StampCase):
             stamp.stamp(self.root, [result("v1.0.0", "empty", DIGEST_A), result("v1.1.0", "present", DIGEST_B, slug="missing")])
         self.assertEqual((self.entry / "README.md").read_text(), before)
 
-    def test_the_verified_on_section_becomes_a_table(self):
+    def test_the_runs_section_becomes_a_table(self):
         stamp.stamp(self.root, [result("v1.0.0", "empty", DIGEST_A)])
         body = self.body()
         self.assertIn("| v1.0.0 | `empty` | 2026-11-14 |", body)
         self.assertIn(f"[run]({RUN})", body)
-        self.assertIn("## Reproduce", body)
+        self.assertIn("### Expected and observed\n\nExpected.", body)
+        self.assertIn("## Method", body)
         self.assertNotIn("No CI run has been recorded yet.", body)
 
     def test_other_front_matter_is_kept(self):
