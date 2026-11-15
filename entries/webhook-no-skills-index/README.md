@@ -3,7 +3,7 @@ id: E1
 slug: webhook-no-skills-index
 title: Don't expect webhook runs to discover skills without the skills toolset
 kind: gotcha
-status: unreported
+status: open
 affected:
 - v2026.8.13
 - v2026.9.21
@@ -14,8 +14,9 @@ affected:
 - v0.23.1
 not_affected: []
 fixed_in: null
-upstream: none-found
-searched_on: 2026-11-13
+upstream:
+- https://github.com/NousResearch/hermes-agent/issues/156206
+- https://github.com/NousResearch/hermes-agent/pull/156218
 evidence:
 - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/agent/system_prompt.py#L307-L311
 - https://github.com/NousResearch/hermes-agent/blob/3b421578588243f920886e6fe79a6faa87ea026e/toolsets.py#L39
@@ -154,7 +155,12 @@ If the route only ever needs a fixed set of skills, list them under the route's 
 
 ## Related work
 
-No upstream issue or pull request found on 2026-11-13. Searched for webhook together with `skills_list`, `skill_view`, "skills index", "skills toolset" and `platform_toolsets`.
+No earlier upstream issue or pull request was found on 2026-11-13 or on 2026-11-15, when the search was repeated over issues and pull requests in every state and over the source on `main`. Searched for webhook together with `skills_list`, `skill_view`, "skills index", "skills toolset" and `platform_toolsets`.
+
+The author reported it on 2026-11-15:
+
+- [#156206](https://github.com/NousResearch/hermes-agent/issues/156206), open: the missing documentation, with this entry's repro.
+- [#156218](https://github.com/NousResearch/hermes-agent/pull/156218), open: a subsection of the webhooks guide that says when a webhook run gets a skills index, and that the `skills` toolset includes `skill_manage`.
 
 ## Threats to validity
 

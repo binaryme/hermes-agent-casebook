@@ -6,6 +6,10 @@ Entries that are removed because they no longer apply to any supported tag are l
 
 ## [Unreleased]
 
+### Changed
+
+- E1 is reported upstream: issue [#156206](https://github.com/NousResearch/hermes-agent/issues/156206) and documentation pull request [#156218](https://github.com/NousResearch/hermes-agent/pull/156218). Its status is now open.
+
 ## [1.0.1] - 2026-11-15
 
 ### Corrected

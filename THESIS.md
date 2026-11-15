@@ -220,7 +220,7 @@ The classification follows the usual split for empirical software engineering [W
 
 **RQ3.** Every entry gives a workaround and states its cost. The repros exercise two of them, E1's `skills` toolset and E3's header mapping, and the field observations show E7's `uv pip install --target` working on one install; the others follow from the source and are not run. The costs: the `skills` toolset for E1 brings `skill_manage`; one skill per route for E2 means merging skills; a relay for E3 is one more process; for E6, E7 and E9, upgrading is the fix and the alternatives each need care.
 
-Future work: report E1 and E3 upstream and follow E2's pull request; extend the pinned tags as upstream releases; test the pip install; and add entries for the deferred candidates, E5 among them. The weekly watch will show when a fix lands.
+Future work: report E3 upstream, and follow E1's issue and documentation pull request ([#156206](https://github.com/NousResearch/hermes-agent/issues/156206), [#156218](https://github.com/NousResearch/hermes-agent/pull/156218)) and E2's pull request; extend the pinned tags as upstream releases; test the pip install; and add entries for the deferred candidates, E5 among them. The weekly watch will show when a fix lands.
 
 ## References
 
