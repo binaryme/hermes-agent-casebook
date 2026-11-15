@@ -253,7 +253,9 @@ class MainTests(StampCase):
         self.assertIn("stamped sample-entry", out)
         evidence = self.root / "evidence" / "1"
         self.assertEqual((evidence / "sample-entry" / "v1.0.0.log").read_text(), "EVIDENCE skills_index chars 0\n")
-        self.assertIn("0123456789abcdef", (evidence / "README.md").read_text())
+        readme = (evidence / "README.md").read_text()
+        self.assertIn("0123456789abcdef", readme)
+        self.assertIn("- Run: <https://github.com/example/casebook/actions/runs/1>", readme)
         sums = (evidence / "SHA256SUMS").read_text()
         self.assertIn("  sample-entry/v1.0.0.json\n", sums)
         self.assertIn("  README.md\n", sums)

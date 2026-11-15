@@ -2,7 +2,7 @@
 
 Copied by `harness/stamp.py` from the artifacts of one CI run, unchanged. Each `<entry>/<tag>.json` is the result `harness/run_repro.py` wrote; each `<entry>/<tag>.log` is the repro's transcript, with temporary paths shown as `$WORK`. `SHA256SUMS` lists every other file in this directory.
 
-- Run: https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222
+- Run: <https://github.com/binaryme/hermes-agent-casebook/actions/runs/43665652222>
 - Workflow: repro, triggered by workflow_dispatch on 2026-11-15T01:59:55Z
 - Commit: `406eb2ebc1a9de94ee2f90bef3b86a287702eb36` on `main`
 

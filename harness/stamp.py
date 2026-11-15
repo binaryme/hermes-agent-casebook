@@ -213,7 +213,7 @@ def evidence_readme(metadata, results):
         "Each `<entry>/<tag>.json` is the result `harness/run_repro.py` wrote; each `<entry>/<tag>.log` is the repro's "
         "transcript, with temporary paths shown as `$WORK`. `SHA256SUMS` lists every other file in this directory.",
         "",
-        f"- Run: {metadata['html_url']}",
+        f"- Run: <{metadata['html_url']}>",
         f"- Workflow: {metadata.get('name')}, triggered by {metadata.get('event')} on {metadata.get('created_at')}",
         f"- Commit: `{metadata['head_sha']}` on `{metadata.get('head_branch')}`",
         "",
