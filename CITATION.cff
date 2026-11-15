@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: If you cite these notes, please cite them as below.
 type: software
-title: hermes-agent-casebook
-abstract: Reproducible operator notes for Hermes Agent. Each entry names the image tags where a behavior shows up and where it does not, and ships a script that CI runs against pinned image digests. Independent; not affiliated with Nous Research.
+title: "Where Hermes Agent surprises its operators: seven reproducible behaviors (hermes-agent-casebook)"
+abstract: Seven behaviors of Hermes Agent that surprise operators, each stated as a falsifiable hypothesis and tested by a script that CI runs against official images pinned by digest, with the run transcripts committed. Written as a thesis. Independent; not affiliated with Nous Research.
 authors:
   - given-names: Israel
     family-names: Ortiz
@@ -10,8 +10,8 @@ repository-code: https://github.com/binaryme/hermes-agent-casebook
 license:
   - CC-BY-4.0
   - MIT
-version: 0.1.0
-date-released: 2026-11-13
+version: 1.0.0
+date-released: 2026-11-15
 keywords:
   - hermes-agent
   - reproducibility
