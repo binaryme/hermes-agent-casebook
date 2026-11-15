@@ -4,7 +4,8 @@ source "$HARNESS/lib.sh"
 
 plain=$(hermes_shell 'command -v python3' 2>/dev/null | tail -n 1)
 login=$(hermes_login_shell 'command -v python3 || echo none' 2>/dev/null | tail -n 1)
-echo "bash -c: $plain; bash -l -c: $login" >&2
+evidence "bash -c: python3 is $plain; bash -l -c: python3 is $login"
+evidence "bash -l -c PATH: $(hermes_login_shell 'echo "$PATH"' 2>/dev/null | tail -n 1)"
 
 case "$plain" in
     /opt/hermes/.venv/*) ;;

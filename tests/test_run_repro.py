@@ -380,6 +380,43 @@ class RunEntryTests(FakeRepoCase):
         self.assertEqual(result["class"], "match")
 
 
+class TranscriptTests(FakeRepoCase):
+    def read_transcript(self, slug, tag):
+        return (self.results / slug / f"{tag}.log").read_text(encoding="utf-8")
+
+    def test_every_run_writes_a_transcript_next_to_its_result(self):
+        self.add_entry("demo", 'echo "EVIDENCE status: 202" >&2\n' + PRINT_ALPHA, {"v1": "alpha"})
+        self.run_entry("demo", "v1")
+        text = self.read_transcript("demo", "v1")
+        self.assertIn("class: match", text)
+        self.assertIn(f"digest: {DIGEST_ONE}", text)
+        self.assertIn("--- stdout ---\nOBSERVED=alpha", text)
+        self.assertIn("--- stderr ---\nEVIDENCE status: 202", text)
+
+    def test_a_repro_error_keeps_its_reason_and_output(self):
+        self.add_entry("demo", 'echo "it broke" >&2\nexit 3\n', {"v1": "alpha"})
+        self.run_entry("demo", "v1")
+        text = self.read_transcript("demo", "v1")
+        self.assertIn("class: repro-error", text)
+        self.assertIn("reason: repro exited with status 3", text)
+        self.assertIn("it broke", text)
+
+    def test_work_and_home_paths_are_neutral(self):
+        self.env["HOME"] = "/home/someone"
+        self.add_entry("demo", 'echo "$WORK/data /home/someone/x"\n' + PRINT_ALPHA, {"v1": "alpha"})
+        self.run_entry("demo", "v1")
+        text = self.read_transcript("demo", "v1")
+        self.assertIn("$WORK/data ~/x", text)
+        self.assertNotIn("/home/someone", text)
+        self.assertNotIn("casebook-demo-", text.split("--- stdout ---")[1])
+
+    def test_long_streams_keep_their_end(self):
+        kept = run_repro.bounded("a" * 100 + "END", limit=10)
+        self.assertTrue(kept.endswith("END"))
+        self.assertIn("bytes dropped", kept)
+        self.assertEqual(run_repro.bounded("short", limit=10), "short")
+
+
 class MainTests(FakeRepoCase):
     def call_main(self, *args):
         stderr = io.StringIO()

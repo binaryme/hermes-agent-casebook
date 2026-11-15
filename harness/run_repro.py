@@ -23,6 +23,7 @@ BEHAVIOR_CHANGED = "behavior-changed"
 REPRO_ERROR = "repro-error"
 DEFAULT_TIMEOUT = 300
 TERMINATE_GRACE_SECONDS = 10
+TRANSCRIPT_STREAM_LIMIT = 64 * 1024
 
 SLUG_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 TAG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
@@ -167,6 +168,53 @@ def write_result(path, result):
     path.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
 
 
+def transcript_path(results_dir, slug, tag):
+    return Path(results_dir) / slug / f"{tag}.log"
+
+
+def neutral_paths(text, work_dir, home):
+    for form in sorted({str(Path(work_dir).resolve()), str(work_dir)}, key=len, reverse=True):
+        text = text.replace(form, "$WORK")
+    if home and len(home) > 1:
+        text = text.replace(home, "~")
+    return text
+
+
+def bounded(text, limit=TRANSCRIPT_STREAM_LIMIT):
+    data = text.encode("utf-8")
+    if len(data) <= limit:
+        return text
+    kept = data[-limit:].decode("utf-8", errors="ignore")
+    return f"[first {len(data) - len(kept.encode('utf-8'))} bytes dropped]\n{kept}"
+
+
+def render_transcript(result, execution, reason, work_dir, home):
+    lines = [
+        f"entry: {result['slug']}",
+        f"tag: {result['tag']}",
+        f"digest: {result['digest']}",
+        f"class: {result['class']}",
+        f"token: {result['token']}",
+        f"expected: {result['expected']}",
+        f"exit: {'timeout' if execution.timed_out else execution.returncode}",
+        f"duration_s: {result['duration_s']}",
+        f"runner: {result['runner']}",
+        f"timestamp_utc: {result['timestamp_utc']}",
+        f"run_url: {result['run_url']}",
+    ]
+    if reason:
+        lines.append(f"reason: {reason}")
+    header = "\n".join(lines)
+    stdout = bounded(neutral_paths(execution.stdout, work_dir, home))
+    stderr = bounded(neutral_paths(execution.stderr, work_dir, home))
+    return f"{header}\n\n--- stdout ---\n{stdout.rstrip()}\n\n--- stderr ---\n{stderr.rstrip()}\n"
+
+
+def write_transcript(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
 def terminate_process_group(process):
     try:
         os.killpg(process.pid, signal.SIGTERM)
@@ -248,6 +296,10 @@ def run_entry(
         describe_run_url(base_env),
     )
     write_result(result_path(results_dir, slug, tag), result)
+    write_transcript(
+        transcript_path(results_dir, slug, tag),
+        render_transcript(result, execution, verdict.reason, work_dir, base_env.get("HOME")),
+    )
     return result, verdict, execution
 
 

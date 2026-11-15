@@ -8,7 +8,7 @@ gateway_up "$WORK/data"
 delivery="casebook-$(date +%s)-$$"
 first=$(post_github notify "$FIXTURES/payload.json" casebook-placeholder-secret "$delivery" push)
 second=$(post_github review "$FIXTURES/payload.json" casebook-placeholder-secret "$delivery" push)
-echo "notify: $first, review: $second $(cat "$WORK/last-response.json")" >&2
+evidence "same X-GitHub-Delivery to two routes: notify status $first, review status $second, review body $(head -c 200 "$WORK/last-response.json")"
 
 if [ "$first" != 202 ]; then
     echo "the first route did not accept the delivery" >&2

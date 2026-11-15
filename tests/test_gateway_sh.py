@@ -173,5 +173,26 @@ class DownTests(GatewayShellCase):
         self.assertEqual(completed.stdout.strip(), "done")
 
 
+class StubTextsTests(GatewayShellCase):
+    def test_only_requests_that_mention_the_marker_are_printed(self):
+        log = self.work / "stub.jsonl"
+        records = [
+            {"method": "GET", "path": "/v1/models"},
+            {"method": "POST", "path": "/v1/chat/completions", "body": {"messages": [{"role": "user", "content": "ROUTE-A with MARKER-1"}]}},
+            {"method": "POST", "path": "/v1/chat/completions", "body": {"messages": [{"role": "user", "content": "ROUTE-B"}]}},
+        ]
+        log.write_text("".join(json.dumps(record) + "\n" for record in records), encoding="utf-8")
+        self.env["STUB_LOG"] = str(log)
+        completed = self.call("stub_texts_matching MARKER-1")
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("ROUTE-A with MARKER-1", completed.stdout)
+        self.assertNotIn("ROUTE-B", completed.stdout)
+
+    def test_evidence_goes_to_stderr_with_a_prefix(self):
+        completed = self.call("evidence status 202")
+        self.assertEqual(completed.stdout, "")
+        self.assertEqual(completed.stderr, "EVIDENCE status 202\n")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -53,6 +53,7 @@ The body has exactly these second-level headings, in this order:
 - It names no image tag. The harness exports the pinned image as `HERMES_IMAGE`, along with `HARNESS`, `ENTRY_DIR`, `FIXTURES`, `WORK` and `HERMES_TAG`.
 - It sources `"$HARNESS/lib.sh"`, and `"$HARNESS/gateway.sh"` when it needs a running gateway.
 - It ends by printing exactly one line, `OBSERVED=<token>`, through `observed <token>`, and exits 0. A token is a short lowercase kebab string such as `empty`, `present` or `alpha-only`.
+- It prints, through `evidence <text>`, the raw values its token is made from: status codes, counts, the matching lines of a request. These go to stderr as `EVIDENCE <text>` lines.
 - It runs on bash 3.2 and on bash 5.
 
 `harness/run_repro.py` compares the token with `expect.json[tag]` and classes the run:
@@ -64,6 +65,12 @@ The body has exactly these second-level headings, in this order:
 | `repro-error` | The script exited nonzero, printed no token or more than one, or timed out. |
 
 A `repro-error` is never read as a behavior.
+
+## Evidence
+
+Next to each result, `run_repro.py` writes `<entry>/<tag>.log`: the result fields, then the repro's stdout and stderr, each capped at 64 KiB, with the temporary work directory shown as `$WORK` and the home directory as `~`. CI uploads both files as the run's artifacts.
+
+GitHub keeps artifacts for 90 days, so a run link alone does not last. `harness/stamp.py --run <id>` copies every result and transcript of that run into `evidence/<id>/`, with a `README.md` naming the run, its commit and its trigger, and a `SHA256SUMS` file. Each entry's results table links to its transcripts there. Only CI runs are copied; a local run is never evidence.
 
 ## Enforced rules
 

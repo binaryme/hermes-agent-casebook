@@ -3,28 +3,24 @@ set -euo pipefail
 source "$HARNESS/lib.sh"
 source "$HARNESS/gateway.sh"
 
-texts_for() {
-    local i=0
-    while [ "$i" -lt "$(stub_count)" ]; do
-        if stub_text "$i" | grep -q "$1"; then stub_text "$i"; fi
-        i=$((i + 1))
-    done
-}
-
 injected() {
     local text alpha=0 beta=0
-    text=$(texts_for "$1")
+    text=$(stub_texts_matching "$1")
     echo "$text" | grep -q ALPHA-7Q && alpha=1
     echo "$text" | grep -q BETA-7Q && beta=1
+    evidence "$1: skill markers in the model request: ALPHA-7Q=$alpha BETA-7Q=$beta; lines: $(echo "$text" | grep -E 'ALPHA-7Q|BETA-7Q' | cut -c 1-160 | tr '\n' '|')"
     case "$alpha$beta" in 10) echo alpha-only ;; 01) echo beta-only ;; 11) echo both ;; *) echo none ;; esac
 }
 
 cp -R "$FIXTURES/data" "$WORK/data"
 gateway_up "$WORK/data"
-test "$(post_v2 both-listed "$FIXTURES/payload.json" casebook-placeholder-secret)" = 202
-test "$(post_v2 first-missing "$FIXTURES/payload.json" casebook-placeholder-secret)" = 202
+both=$(post_v2 both-listed "$FIXTURES/payload.json" casebook-placeholder-secret)
+missing=$(post_v2 first-missing "$FIXTURES/payload.json" casebook-placeholder-secret)
+evidence "POST status: both-listed $both, first-missing $missing"
+test "$both" = 202
+test "$missing" = 202
 waited=0
-until [ -n "$(texts_for ROUTE-BOTH)" ] && [ -n "$(texts_for ROUTE-MISSING)" ]; do
+until [ -n "$(stub_texts_matching ROUTE-BOTH)" ] && [ -n "$(stub_texts_matching ROUTE-MISSING)" ]; do
     [ "$waited" -lt 120 ] || { echo "a route's request never reached the stub model" >&2; exit 1; }
     sleep 2
     waited=$((waited + 2))

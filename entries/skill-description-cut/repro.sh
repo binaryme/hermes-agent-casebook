@@ -9,9 +9,11 @@ shown=$(python3 - "$WORK/prompt-size.out" <<'PY'
 import json, sys
 text = open(sys.argv[1]).read()
 skills = {s["name"]: s["index_line_bytes"] for s in json.loads(text[text.index("{\n"):])["skills_breakdown"]}
-print(skills["casebook-trims"] - skills["casebook-short"] + 40)
+print(skills["casebook-trims"] - skills["casebook-short"] + 40, skills["casebook-trims"], skills["casebook-short"])
 PY
 )
+evidence "index_line_bytes: casebook-trims $(echo "$shown" | cut -d' ' -f2), casebook-short $(echo "$shown" | cut -d' ' -f3); the short description is 40 characters, so the long one is shown as $(echo "$shown" | cut -d' ' -f1)"
+shown=$(echo "$shown" | cut -d' ' -f1)
 case "$shown" in
     60) observed hard-cut ;;
     56) observed word-cut ;;

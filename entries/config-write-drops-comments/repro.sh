@@ -16,10 +16,13 @@ in_image() {
 comments_after() {
     in_image "$1" cat /opt/data/config.yaml >"$WORK/$1.after"
     grep -q "$2" "$WORK/$1.after" || { echo "$1: the write did not happen" >&2; cat "$WORK/$1.after" >&2; exit 1; }
+    evidence "$1: config.yaml after the write: $(wc -l <"$WORK/$1.after" | tr -d ' ') lines, $(grep -c '^ *#' "$WORK/$1.after" || true) comment lines, $(grep -m 1 '^_config_version:' "$WORK/$1.after" || echo 'no _config_version')"
+    evidence "$1: first lines after the write: $(head -n 12 "$WORK/$1.after" | tr '\n' '|')"
     if grep -qF '# Operator notes, kept by hand.' "$WORK/$1.after" && grep -qF '# Keep runs short on this host.' "$WORK/$1.after"; then echo kept; else echo lost; fi
 }
 
 prepare set ''
+evidence "config.yaml before each write: $(tr '\n' '|' <"$WORK/set/config.yaml")"
 in_image set hermes config set agent.max_turns 42 >"$WORK/set.out" 2>&1 || { cat "$WORK/set.out" >&2; exit 1; }
 set_result=$(comments_after set 'max_turns: 42')
 

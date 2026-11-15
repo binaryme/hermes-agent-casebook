@@ -72,6 +72,17 @@ Limits.
 """
 
 
+def fake_metadata(run_id, repository=None):
+    return {
+        "head_sha": "0123456789abcdef0123456789abcdef01234567",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "created_at": "2026-11-14T01:00:00Z",
+        "html_url": f"https://github.com/example/casebook/actions/runs/{run_id}",
+        "name": "repro",
+    }
+
+
 def result(tag, token, digest, run_url=RUN, outcome="match", slug="sample-entry"):
     return {
         "slug": slug,
@@ -212,8 +223,11 @@ class IndexTests(StampCase):
 class MainTests(StampCase):
     def run_main(self, argv, download=None):
         out, err = io.StringIO(), io.StringIO()
+        options = {"metadata": fake_metadata}
+        if download:
+            options["download"] = download
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            code = stamp.main(argv + ["--root", str(self.root)], **({"download": download} if download else {}))
+            code = stamp.main(argv + ["--root", str(self.root)], **options)
         return code, out.getvalue(), err.getvalue()
 
     def test_run_mode_downloads_then_stamps(self):
@@ -224,11 +238,35 @@ class MainTests(StampCase):
             target = Path(destination) / "results-v1.0.0" / "sample-entry"
             target.mkdir(parents=True)
             (target / "v1.0.0.json").write_text(json.dumps(result("v1.0.0", "empty", DIGEST_A)))
+            (target / "v1.0.0.log").write_text("EVIDENCE skills_index chars 0\n")
 
-        code, out, _ = self.run_main(["--run", "42", "--repo", "example/casebook"], fake_download)
+        code, out, _ = self.run_main(["--run", "1", "--repo", "example/casebook"], fake_download)
         self.assertEqual(code, 0)
-        self.assertEqual(calls, [("42", "example/casebook")])
+        self.assertEqual(calls, [("1", "example/casebook")])
         self.assertIn("stamped sample-entry", out)
+        evidence = self.root / "evidence" / "1"
+        self.assertEqual((evidence / "sample-entry" / "v1.0.0.log").read_text(), "EVIDENCE skills_index chars 0\n")
+        self.assertIn("0123456789abcdef", (evidence / "README.md").read_text())
+        sums = (evidence / "SHA256SUMS").read_text()
+        self.assertIn("  sample-entry/v1.0.0.json\n", sums)
+        self.assertIn("  README.md\n", sums)
+        entry = (self.root / "entries" / "sample-entry" / "README.md").read_text()
+        self.assertIn("[log](../../evidence/1/sample-entry/v1.0.0.log)", entry)
+
+    def test_run_mode_refuses_results_from_another_run(self):
+        def fake_download(run_id, destination, repository):
+            target = Path(destination) / "results-v1.0.0" / "sample-entry"
+            target.mkdir(parents=True)
+            (target / "v1.0.0.json").write_text(json.dumps(result("v1.0.0", "empty", DIGEST_A)))
+
+        code, _, err = self.run_main(["--run", "42"], fake_download)
+        self.assertEqual(code, 2)
+        self.assertIn("not only from", err)
+        self.assertFalse((self.root / "evidence").exists())
+
+    def test_a_stamp_without_committed_evidence_shows_no_transcript(self):
+        section = stamp.verified_section([stamp.verified_item(result("v1.0.0", "empty", DIGEST_A))], self.root, "sample-entry")
+        self.assertIn("| none |", section)
 
     def test_index_only(self):
         code, _, _ = self.run_main(["--index-only"])

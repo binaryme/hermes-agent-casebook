@@ -53,3 +53,7 @@ observed() {
     fi
     printf 'OBSERVED=%s\n' "$token"
 }
+
+evidence() {
+    printf 'EVIDENCE %s\n' "$*" >&2
+}

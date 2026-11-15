@@ -192,3 +192,11 @@ stub_wait() {
 stub_text() {
     python3 "$HARNESS/stub_model.py" text --log "$STUB_LOG" "$1"
 }
+
+stub_texts_matching() {
+    local i=0
+    while [ "$i" -lt "$(stub_count)" ]; do
+        if stub_text "$i" | grep -q "$1"; then stub_text "$i"; fi
+        i=$((i + 1))
+    done
+}

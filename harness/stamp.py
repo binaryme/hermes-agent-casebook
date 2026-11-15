@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import argparse
+import hashlib
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -17,6 +19,8 @@ INDEX_HEADER = (
 VERIFIED_HEADING = "## Verified on"
 SECTION_PATTERN = re.compile(r"^## Verified on[ \t]*\n.*?(?=^## |\Z)", re.MULTILINE | re.DOTALL)
 RESULT_ARTIFACT_PREFIX = "results-"
+EVIDENCE_DIR = "evidence"
+RUN_ID_PATTERN = re.compile(r"/actions/runs/(\d+)$")
 NO_RUN_TEXT = "No CI run has been recorded yet. Every statement below is source reading.\n"
 
 
@@ -80,24 +84,44 @@ def fully_verified(verified, expectations, pinned):
     return bool(expectations) and set(expectations) <= current
 
 
-def verified_section(verified):
+def run_id_of(run_url):
+    match = RUN_ID_PATTERN.search(run_url or "")
+    if not match:
+        raise StampError(f"not a GitHub Actions run URL: {run_url!r}")
+    return match.group(1)
+
+
+def transcript_link(root, slug, item):
+    relative = Path(EVIDENCE_DIR) / run_id_of(item["run"]) / slug / f"{item['tag']}.log"
+    if root is None or not (Path(root) / relative).is_file():
+        return "none"
+    return f"[log](../../{relative.as_posix()})"
+
+
+def verified_section(verified, root=None, slug=None):
     if not verified:
         return f"{VERIFIED_HEADING}\n\n{NO_RUN_TEXT}\n"
-    lines = [VERIFIED_HEADING, "", "| Tag | Observed | Date | Digest | Run |", "| --- | --- | --- | --- | --- |"]
+    lines = [
+        VERIFIED_HEADING,
+        "",
+        "| Tag | Observed | Date | Digest | Run | Transcript |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
     for item in verified:
         lines.append(
-            f"| {item['tag']} | `{item['observed']}` | {item['date']} | `{item['digest'][:19]}` | [run]({item['run']}) |"
+            f"| {item['tag']} | `{item['observed']}` | {item['date']} | `{item['digest'][:19]}` | [run]({item['run']})"
+            f" | {transcript_link(root, slug, item)} |"
         )
     return "\n".join(lines) + "\n\n"
 
 
-def replace_verified_section(body, verified):
+def replace_verified_section(body, verified, root=None, slug=None):
     if not SECTION_PATTERN.search(body):
         raise StampError("entry has no Verified on section")
-    return SECTION_PATTERN.sub(lambda _: verified_section(verified), body, count=1)
+    return SECTION_PATTERN.sub(lambda _: verified_section(verified, root, slug), body, count=1)
 
 
-def stamp_entry(entry_dir, results, images):
+def stamp_entry(entry_dir, results, images, root=None):
     readme = entry_dir / "README.md"
     front, body = split_entry(readme.read_text(encoding="utf-8"))
     expectations = json.loads((entry_dir / "expect.json").read_text(encoding="utf-8"))
@@ -106,7 +130,8 @@ def stamp_entry(entry_dir, results, images):
     front["verified_on"] = verified
     if fully_verified(verified, expectations, images["tags"]):
         front["confidence"] = "reproduced"
-    readme.write_text(join_entry(front, replace_verified_section(body, verified)), encoding="utf-8")
+    body = replace_verified_section(body, verified, root, entry_dir.name)
+    readme.write_text(join_entry(front, body), encoding="utf-8")
     return front
 
 
@@ -167,6 +192,67 @@ def download_run(run_id, destination, repository=None, run=subprocess.run):
     run(command, check=True)
 
 
+def run_metadata(run_id, repository=None, run=subprocess.run):
+    completed = run(
+        ["gh", "api", f"repos/{repository or '{owner}/{repo}'}/actions/runs/{run_id}",
+         "--jq", "{head_sha, head_branch, event, created_at, html_url, name}"],
+        capture_output=True, text=True, check=True,
+    )
+    return json.loads(completed.stdout)
+
+
+def sha256_of(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def evidence_readme(metadata, results):
+    lines = [
+        f"# Evidence: run {run_id_of(metadata['html_url'])}",
+        "",
+        "Copied by `harness/stamp.py` from the artifacts of one CI run, unchanged. "
+        "Each `<entry>/<tag>.json` is the result `harness/run_repro.py` wrote; each `<entry>/<tag>.log` is the repro's "
+        "transcript, with temporary paths shown as `$WORK`. `SHA256SUMS` lists every other file in this directory.",
+        "",
+        f"- Run: {metadata['html_url']}",
+        f"- Workflow: {metadata.get('name')}, triggered by {metadata.get('event')} on {metadata.get('created_at')}",
+        f"- Commit: `{metadata['head_sha']}` on `{metadata.get('head_branch')}`",
+        "",
+        "| Entry | Tag | Class | Observed | Expected | Transcript |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for result in sorted(results, key=lambda r: (r["slug"], r["tag"])):
+        lines.append(
+            f"| {result['slug']} | {result['tag']} | {result['class']} | `{result['token']}` | `{result['expected']}` |"
+            f" [log]({result['slug']}/{result['tag']}.log) |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def write_evidence(root, source_dir, results, metadata):
+    if not results:
+        return None
+    run_ids = {run_id_of(result.get("run_url")) for result in results}
+    if run_ids != {run_id_of(metadata["html_url"])}:
+        raise StampError(f"results come from runs {sorted(run_ids)}, not only from {metadata['html_url']}")
+    target = Path(root) / EVIDENCE_DIR / run_ids.pop()
+    if target.exists():
+        shutil.rmtree(target)
+    for result in results:
+        for suffix in (".json", ".log"):
+            matches = sorted(Path(source_dir).rglob(f"{result['slug']}/{result['tag']}{suffix}"))
+            if suffix == ".json" and not matches:
+                raise StampError(f"{result['slug']} {result['tag']}: result file not found in the download")
+            if matches:
+                destination = target / result["slug"] / f"{result['tag']}{suffix}"
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(matches[0], destination)
+    (target / "README.md").write_text(evidence_readme(metadata, results), encoding="utf-8")
+    files = sorted(path for path in target.rglob("*") if path.is_file() and path.name != "SHA256SUMS")
+    sums = "".join(f"{sha256_of(path)}  {path.relative_to(target).as_posix()}\n" for path in files)
+    (target / "SHA256SUMS").write_text(sums, encoding="utf-8")
+    return target
+
+
 def stamp(root, results, write_index=True):
     root = Path(root)
     images = json.loads((root / "harness" / "images.json").read_text(encoding="utf-8"))
@@ -181,7 +267,7 @@ def stamp(root, results, write_index=True):
             raise StampError(f"no entry named {result['slug']}")
         by_slug.setdefault(result["slug"], []).append(result)
     for slug, slug_results in sorted(by_slug.items()):
-        stamp_entry(root / "entries" / slug, slug_results, images)
+        stamp_entry(root / "entries" / slug, slug_results, images, root)
     if write_index:
         (root / "INDEX.md").write_text(render_index(entry_fronts(root / "entries")), encoding="utf-8")
     return sorted(by_slug), skipped
@@ -198,7 +284,7 @@ def build_parser():
     return parser
 
 
-def main(argv=None, download=download_run):
+def main(argv=None, download=download_run, metadata=run_metadata):
     args = build_parser().parse_args(argv)
     try:
         if args.index_only:
@@ -208,7 +294,9 @@ def main(argv=None, download=download_run):
         else:
             with tempfile.TemporaryDirectory() as directory:
                 download(args.run, directory, args.repo)
-                stamped, skipped = stamp(args.root, load_results(directory))
+                results = load_results(directory)
+                write_evidence(args.root, directory, results, metadata(args.run, args.repo))
+                stamped, skipped = stamp(args.root, results)
     except (StampError, OSError, ValueError, KeyError, subprocess.CalledProcessError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
